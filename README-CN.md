@@ -8,6 +8,7 @@
 
 - [RPC Util SDK for Java](./java/README-CN.md)
 - [RPC UTil SDK for .Net](./csharp/README-CN.md)
+- [RPC UTil SDK for Go](./golang/README-CN.md)
 
 ## 问题
 [Opening an Issue](https://github.com/aliyun/alibabacloud-rpc-util-sdk/issues/new)，不符合指南的问题可能会立即关闭。
