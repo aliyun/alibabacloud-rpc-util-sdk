@@ -12,3 +12,14 @@ target/
 .classpath
 .project
 .history/
+
+# Tea
+libraries
+.libraries.json
+
+# Swift Package Manager
+.build/
+Packages/
+Package.pins
+Package.resolved
+*.xcodeproj
