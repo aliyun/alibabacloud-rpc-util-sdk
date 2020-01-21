@@ -12,4 +12,6 @@ target/
 .classpath
 .project
 .history/
+coverage.html
+coverage.out
 node_modules/

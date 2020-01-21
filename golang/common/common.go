@@ -81,10 +81,7 @@ func Convert(input, output interface{}) {
 			res[name] = val.Field(i).Interface()
 		}
 	}
-	byt, err := json.Marshal(res)
-	if err != nil {
-		return
-	}
+	byt, _ := json.Marshal(res)
 	json.Unmarshal(byt, output)
 }
 
@@ -200,7 +197,7 @@ func GetErrMessage(bodyStr string) map[string]interface{} {
 
 func ToForm(body map[string]interface{}, boundary string) string {
 	if obj := body["UserMeta"]; obj != nil {
-		meta := obj.(map[string]interface{})
+		meta := obj.(map[string]string)
 		delete(body, "UserMeta")
 		for key, value := range meta {
 			body["x-oss-meta-"+key] = value
