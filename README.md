@@ -2,7 +2,7 @@ English | [简体中文](README-CN.md)
 
 ![](https://aliyunsdk-pages.alicdn.com/icons/AlibabaCloud.svg)
 
-## Alibaba Cloud RPC Util SDK for TypeScript/Node.js
+## Alibaba Cloud RPC Util SDK
 [![Travis Build Status](https://travis-ci.org/aliyun/alibabacloud-rpc-util-sdk.svg?branch=master)](https://travis-ci.org/aliyun/alibabacloud-rpc-util-sdk)
 [![codecov](https://codecov.io/gh/aliyun/alibabacloud-rpc-util-sdk/branch/master/graph/badge.svg)](https://codecov.io/gh/aliyun/alibabacloud-rpc-util-sdk)
 ## Installation
