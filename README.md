@@ -10,7 +10,7 @@ English | [简体中文](README-CN.md)
 - [RPC Util SDK for Java](./java/README.md)
 - [RPC Util SDK for .Net](./csharp/README.md)
 - [RPC Util SDK for Go](./golang/README.md)
-- [RPC UTil SDK for TypeScript/Node.js](./ts/README.md)
+- [RPC Util SDK for TypeScript/Node.js](./ts/README.md)
 
 
 ## Issues
