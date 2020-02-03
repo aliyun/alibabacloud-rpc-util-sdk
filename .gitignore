@@ -12,6 +12,10 @@ target/
 .classpath
 .project
 .history/
-coverage.html
-coverage.out
-node_modules/
+
+# Swift Package Manager
+.build/
+Packages/
+Package.pins
+Package.resolved
+*.xcodeproj
