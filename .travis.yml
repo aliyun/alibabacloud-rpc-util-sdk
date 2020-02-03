@@ -1,5 +1,23 @@
+language: swift
+osx_image: xcode11.3
+
 jobs:
   include:
+    - language: swift
+      osx_image: xcode11.3
+      env:
+        - SCHEME="AlibabaCloudCommons-Package" DESTINATION="platform=OS X,arch=x86_64" SDK=macosx PLATFORM="OSX"
+      script:
+        - cd swift
+        - swift package generate-xcodeproj --enable-code-coverage
+        - xcodebuild clean build -project AlibabaCloudCommons.xcodeproj -scheme "$SCHEME" -sdk "$SDK" -destination "$DESTINATION" -configuration Debug ONLY_ACTIVE_ARCH=NO test
+        - xcodebuild test -project AlibabaCloudCommons.xcodeproj -scheme "$SCHEME" -sdk "$SDK" -destination "$DESTINATION" -configuration Debug ONLY_ACTIVE_ARCH=NO test 
+      after_success:
+        - bash <(curl -s https://codecov.io/bash) -J 'AlibabaCloudCommons$'
+      notifications:
+        email:
+          on_success: never
+
     - language: go
       go: 1.12.x
       if: branch = master
@@ -9,4 +27,4 @@ jobs:
         - go mod tidy
         - go test -race -coverprofile=coverage.txt -covermode=atomic ./common/... ./utils...
       after_success:
-        - bash <(curl -s https://codecov.io/bash) -cF go
+        - bash <(curl -s https://codecov.io/bash) -cF go 
