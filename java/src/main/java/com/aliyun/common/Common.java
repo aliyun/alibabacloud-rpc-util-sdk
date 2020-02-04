@@ -44,7 +44,9 @@ public class Common {
 
     public static Map<String, String> query(Map<String, Object> map) {
         Map<String, String> outMap = new HashMap<>(16);
-        map.forEach((k, v) -> outMap.put(k, v == null ? "" : String.valueOf(v)));
+        if (null != map) {
+            map.forEach((k, v) -> outMap.put(k, v == null ? "" : String.valueOf(v)));
+        }
         return outMap;
     }
 
@@ -71,7 +73,7 @@ public class Common {
 
     public static String getEndpoint(String endpoint, boolean useAccelerate, String endpointType) {
         if ("internal".equals(endpointType)) {
-            String[] strs = endpoint.split(".");
+            String[] strs = endpoint.split("\\.");
             strs[0] += "-internal";
             endpoint = String.join(".", strs);
         }
@@ -227,7 +229,7 @@ public class Common {
 
     public static String getHost(String str, String regionId, String _endpoint) {
         if (null == _endpoint) {
-            String serviceCode = str.split("_")[0].toLowerCase();
+            String serviceCode = str.split("\\_")[0].toLowerCase();
             return String.format("%s.%s.aliyuncs.com", serviceCode, regionId);
         } else {
             return _endpoint;
@@ -242,7 +244,7 @@ public class Common {
 
     public static boolean hasError(Map<String, Object> body) {
         if (null == body) {
-            return true;
+            return false;
         }
         return null != body.get("Code");
     }
