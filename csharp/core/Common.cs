@@ -17,7 +17,7 @@ using Newtonsoft.Json.Linq;
 
 using Tea;
 
-namespace AlibabaCloud
+namespace AlibabaCloud.Commons
 {
     public static class Common
     {
@@ -262,6 +262,11 @@ namespace AlibabaCloud
 
         public static string GetHost(string product, string regionid, string endpoint)
         {
+            if(endpoint == null)
+            {
+                string serviceCode = product.Split('_')[0].ToLower();
+                return string.Format("{0}.{1}.aliyuncs.com",serviceCode,regionid);
+            }
             return endpoint;
         }
 
