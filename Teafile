@@ -4,6 +4,7 @@
 	"version": "0.0.4",
 	"main": "./main.tea",
 	"releases": {
-		"go": "github.com/aliyun/alibabacloud-rpc-util-sdk/golang/common:v1.0.0"
+		"go": "github.com/aliyun/alibabacloud-rpc-util-sdk/golang/common:v1.0.0",
+		"java": "com.aliyun:common:0.0.3"
 	}
 }
