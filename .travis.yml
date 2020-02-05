@@ -1,9 +1,11 @@
 language: swift
+os: linux
 osx_image: xcode11.3
 
 jobs:
   include:
     - language: swift
+      os: osx
       osx_image: xcode11.3
       env:
         - SCHEME="AlibabaCloudCommons-Package" DESTINATION="platform=OS X,arch=x86_64" SDK=macosx PLATFORM="OSX"
@@ -14,13 +16,9 @@ jobs:
         - xcodebuild test -project AlibabaCloudCommons.xcodeproj -scheme "$SCHEME" -sdk "$SDK" -destination "$DESTINATION" -configuration Debug ONLY_ACTIVE_ARCH=NO test 
       after_success:
         - bash <(curl -s https://codecov.io/bash) -J 'AlibabaCloudCommons$'
-      notifications:
-        email:
-          on_success: never
 
     - language: go
       go: 1.12.x
-      if: branch = master
       script:
         - cd golang
         - export GO111MODULE=on
@@ -30,10 +28,14 @@ jobs:
         - bash <(curl -s https://codecov.io/bash) -cF go
 
     - language: java
-      jdk: openjdk8
-      if: branch = master
+      os: linux
+      jdk: openjdk9
       script:
         - cd java
         - mvn test -B
       after_success:
         - bash <(curl -s https://codecov.io/bash) -cF java
+
+notifications:
+  email:
+    on_success: never
