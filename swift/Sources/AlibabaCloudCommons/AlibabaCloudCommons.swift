@@ -12,11 +12,11 @@ public class AlibabaCloudCommons {
     public static var clientVersion: String = "UnknownClientVersion"
     public static var coreVersion: String = "UnknownCoreVersion"
 
-    func readAsString(_ data: Data) -> String {
+    public static func readAsString(_ data: Data) -> String {
         String(data: data, encoding: .utf8) ?? ""
     }
 
-    func getEndpoint(_ endpoint: String, _ useAccelerate: Bool, _ endpointType: String = "public") -> String {
+    public static func getEndpoint(_ endpoint: String, _ useAccelerate: Bool, _ endpointType: String = "public") -> String {
         var endpointStr = endpoint
         if endpointType == "internal" {
             var tmp = endpoint.split(separator: ".")
@@ -29,19 +29,19 @@ public class AlibabaCloudCommons {
         return endpointStr
     }
 
-    public static func getHost(_ serviceCode: String, regionId: String, _ endpoint: String? = nil) -> String {
+    public static func getHost(_ serviceCode: String, _ regionId: String, _ endpoint: String? = nil) -> String {
         if endpoint == nil {
             var tmp: [String] = [String]()
-            tmp[0] = serviceCode.lowercased()
-            tmp[1] = regionId.lowercased()
-            tmp[2] = "aliyuncs.com"
+            tmp.append(serviceCode.lowercased())
+            tmp.append(regionId.lowercased())
+            tmp.append("aliyuncs.com")
             return tmp.joined(separator: ".")
         } else {
             return endpoint!
         }
     }
 
-    func convert(_ input: TeaModel, _ output: TeaModel) -> Void {
+    public static func convert(_ input: TeaModel, _ output: TeaModel) -> Void {
         let mirror = Mirror(reflecting: input)
         for (label, value) in mirror.children {
             if label != nil && label != "" {
