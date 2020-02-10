@@ -209,12 +209,6 @@ public class CommonTest {
     }
 
     @Test
-    public void getContentLengthTest() throws Exception{
-        Assert.assertEquals(0, Common.getContentLength("").intValue());
-        Assert.assertEquals(1, Common.getContentLength("s").intValue());
-    }
-
-    @Test
     public void readAsStringTest() throws IOException {
         TeaResponse teaResponse = mock(TeaResponse.class);
         when(teaResponse.getResponse()).thenReturn(new ByteArrayInputStream("test".getBytes()));

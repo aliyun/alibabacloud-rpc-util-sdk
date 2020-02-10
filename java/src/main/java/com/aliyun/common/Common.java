@@ -64,13 +64,6 @@ public class Common {
     }
 
 
-    public static Integer getContentLength(String str) {
-        if (StringUtils.isEmpty(str)) {
-            return 0;
-        }
-        return str.length();
-    }
-
     public static String getEndpoint(String endpoint, boolean useAccelerate, String endpointType) {
         if ("internal".equals(endpointType)) {
             String[] strs = endpoint.split("\\.");
