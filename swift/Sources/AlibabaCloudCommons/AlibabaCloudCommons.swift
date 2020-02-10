@@ -16,10 +16,6 @@ public class AlibabaCloudCommons {
         String(data: data, encoding: .utf8) ?? ""
     }
 
-    func getContentLength(_ str: String) -> Int {
-        str.lengthOfBytes(using: .utf8)
-    }
-
     func getEndpoint(_ endpoint: String, _ useAccelerate: Bool, _ endpointType: String = "public") -> String {
         var endpointStr = endpoint
         if endpointType == "internal" {
@@ -33,6 +29,18 @@ public class AlibabaCloudCommons {
         return endpointStr
     }
 
+    public static func getHost(_ serviceCode: String, regionId: String, _ endpoint: String? = nil) -> String {
+        if endpoint == nil {
+            var tmp: [String] = [String]()
+            tmp[0] = serviceCode.lowercased()
+            tmp[1] = regionId.lowercased()
+            tmp[2] = "aliyuncs.com"
+            return tmp.joined(separator: ".")
+        } else {
+            return endpoint!
+        }
+    }
+
     func convert(_ input: TeaModel, _ output: TeaModel) -> Void {
         let mirror = Mirror(reflecting: input)
         for (label, value) in mirror.children {
@@ -42,27 +50,8 @@ public class AlibabaCloudCommons {
         }
     }
 
-    func _default(_ str: String, _ defaultStr: String) -> String {
-        let tmp = str.trimmingCharacters(in: .whitespaces)
-        if tmp.isEmpty {
-            return defaultStr
-        }
-        return str
-    }
-
-    public func defaultNumber(_ number: Int, _ defaultNumber: Int) -> Int {
-        if number > 0 {
-            return number
-        }
-        return defaultNumber
-    }
-
-    public static func getTimestamp() -> TimeInterval {
-        Date().toTimestamp()
-    }
-
-    public static func getUserAgent(_ userAgent: String) -> String {
-        _defaultUserAgent + " " + userAgent;
+    public static func getNonce() -> String {
+        uuid()
     }
 
     public static func getSignature(_ request: TeaRequest, _ secret: String) -> String {
@@ -87,6 +76,10 @@ public class AlibabaCloudCommons {
         return true;
     }
 
+    public static func getTimestamp() -> TimeInterval {
+        Date().toTimestamp()
+    }
+
     public static func query(_ dict: [String: AnyObject]) -> [String: AnyObject] {
         var outDict: [String: AnyObject] = [String: AnyObject]()
         for (key, value) in dict {
@@ -95,8 +88,27 @@ public class AlibabaCloudCommons {
         return outDict
     }
 
-    public static func getNonce() -> String {
-        uuid()
+    func _default(_ str: String, _ defaultStr: String) -> String {
+        let tmp = str.trimmingCharacters(in: .whitespaces)
+        if tmp.isEmpty {
+            return defaultStr
+        }
+        return str
+    }
+
+    public func defaultNumber(_ number: Int, _ defaultNumber: Int) -> Int {
+        if number > 0 {
+            return number
+        }
+        return defaultNumber
+    }
+
+    public static func getUserAgent(_ userAgent: String) -> String {
+        _defaultUserAgent + " " + userAgent;
+    }
+
+    public static func getDate() -> String {
+        Date().toString()
     }
 
     public static func parseXml(_ content: String) throws -> XML.Accessor {
@@ -109,23 +121,6 @@ public class AlibabaCloudCommons {
         }
     }
 
-    public static func empty(_ str: String) -> Bool {
-        str.trimmingCharacters(in: .whitespaces).lengthOfBytes(using: .utf8) == 0
-    }
-
-    public static func equal(_ val1: String, _ val2: String) -> Bool {
-        val1 == val2
-    }
-
-    public static func getErrMessage(_ bodyStr: String) -> [String: AnyObject] {
-        [String: AnyObject]()
-    }
-
-    public static func isFail(_ response: TeaResponse) -> Bool {
-        let statusCode: Int = Int(response.statusCode) ?? 0
-        return 200 <= statusCode && statusCode < 300
-    }
-
     public static func toForm(dict: [String: AnyObject]?, _ boundary: String) -> String {
         if dict == nil || dict?.count == 0 {
             return ""
@@ -133,9 +128,9 @@ public class AlibabaCloudCommons {
         var dic: [String: AnyObject] = dict!
 
         var str: String = ""
-        var file: [String:String]? = nil
+        var file: [String: String]? = nil
         if dic["file"] != nil {
-            file = (dic["file"] as! [String:String])
+            file = (dic["file"] as! [String: String])
             dic.removeValue(forKey: "file")
         }
         if dic["UserMeta"] != nil {
@@ -153,7 +148,7 @@ public class AlibabaCloudCommons {
             str += (value as! String) + "\r\n"
         }
         if file != nil {
-            let headerFile:[String:String] = file ?? [String:String]()
+            let headerFile: [String: String] = file ?? [String: String]()
             str += "--" + boundary + "\r\n"
             str += "Content-Disposition: form-data; name=\"file\"; filename=\"" + (headerFile["filename"] ?? "") + "\"\r\n\r\n"
             str += "Content-Type: " + (headerFile["content-type"] ?? "")
@@ -163,25 +158,26 @@ public class AlibabaCloudCommons {
         return str
     }
 
-    public static func getDate() -> String {
-        Date().toString()
+    public static func getErrMessage(_ bodyStr: String) -> [String: AnyObject] {
+        [String: AnyObject]()
     }
 
-    public static func getHost(_ serviceCode: String, regionId: String, _ endpoint: String? = nil) -> String {
-        if endpoint == nil {
-            var tmp: [String] = [String]()
-            tmp[0] = serviceCode.lowercased()
-            tmp[1] = regionId.lowercased()
-            tmp[2] = "aliyuncs.com"
-            return tmp.joined(separator: ".")
-        } else {
-            return endpoint!
-        }
+    public static func isFail(_ response: TeaResponse) -> Bool {
+        let statusCode: Int = Int(response.statusCode) ?? 0
+        return 200 <= statusCode && statusCode < 300
     }
 
     public static func getBoundary() -> String {
         let boundary: CLong = CLong(arc4random() / UInt32.max) * CLong.max
         return boundary.toString()
+    }
+
+    public static func empty(_ str: String) -> Bool {
+        str.trimmingCharacters(in: .whitespaces).lengthOfBytes(using: .utf8) == 0
+    }
+
+    public static func equal(_ val1: String, _ val2: String) -> Bool {
+        val1 == val2
     }
 
     private static func getDefaultUserAgent() -> String {
