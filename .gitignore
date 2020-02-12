@@ -12,6 +12,8 @@ target/
 .classpath
 .project
 .history/
+coverage.html
+coverage.out
 
 # Swift Package Manager
 .build/
