@@ -132,7 +132,7 @@ func HasError(body map[string]interface{}) bool {
 		return true
 	}
 	if obj := body["Code"]; obj != nil {
-		if statusCode := body["Code"].(string); statusCode != "" {
+		if statusCode := body["Code"].(string); statusCode != "" && statusCode != "0" {
 			return true
 		}
 	}
@@ -195,7 +195,8 @@ func GetErrMessage(bodyStr string) map[string]interface{} {
 	return resp
 }
 
-func ToForm(body map[string]interface{}, boundary string) string {
+func ToForm(body map[string]interface{}, content io.Reader, boundary string) io.Reader {
+	out := bytes.NewBuffer(nil)
 	if obj := body["UserMeta"]; obj != nil {
 		meta := obj.(map[string]string)
 		delete(body, "UserMeta")
@@ -204,26 +205,45 @@ func ToForm(body map[string]interface{}, boundary string) string {
 		}
 	}
 	line := "--" + boundary + "\r\n"
-	reqBody := line
+	out.Write([]byte(line))
 	for key, value := range body {
 		if val, ok := value.(string); ok {
 			if val != "" {
-				reqBody = reqBody + "Content-Disposition: form-data; name=\"" + key + "\"" + "\r\n\r\n"
-				reqBody = reqBody + val + "\r\n"
-				reqBody = reqBody + line
+				out.Write([]byte("Content-Disposition: form-data; name=\"" + key + "\"" + "\r\n\r\n"))
+				out.Write([]byte(val + "\r\n"))
+				out.Write([]byte(line))
 			}
 		}
 	}
 	if obj, ok := body["file"]; ok {
-		file := make(map[string]string)
+		var buffer [512]byte
+		file := make(map[string]interface{})
 		byt, _ := json.Marshal(obj)
 		json.Unmarshal(byt, &file)
-		reqBody = reqBody + "Content-Disposition: form-data; name=\"file\"" + "; " + "filename=\"" + file["filename"] + "\"" + "\r\n"
-		reqBody = reqBody + "Content-Type: " + file["content-type"] + "\r\n\r\n"
-		reqBody = reqBody + file["content"] + "\r\n\r\n"
+		if file["filename"] != nil {
+			out.Write([]byte("Content-Disposition: form-data; name=\"file\"" + "; " + "filename=\"" + file["filename"].(string) + "\"" + "\r\n"))
+		} else {
+			out.Write([]byte("Content-Disposition: form-data; name=\"file\"" + "; " + "filename=\"\"" + "\r\n"))
+		}
+
+		if file["content-type"] != nil {
+			out.Write([]byte("Content-Type: " + file["content-type"].(string) + "\r\n\r\n"))
+		} else {
+			out.Write([]byte("Content-Type: \r\n\r\n"))
+		}
+		for {
+			n, err := content.Read(buffer[0:])
+			out.Write(buffer[0:n])
+			if err != nil && err == io.EOF {
+				break
+			} else if err != nil {
+				return nil
+			}
+		}
+		out.Write([]byte("\r\n\r\n"))
 	}
-	reqBody = reqBody + "--" + boundary + "--\r\n"
-	return reqBody
+	out.Write([]byte("--" + boundary + "--\r\n"))
+	return out
 }
 
 func GetDate() string {
