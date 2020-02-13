@@ -121,9 +121,9 @@ public class AlibabaCloudCommons {
         }
     }
 
-    public static func toForm(dict: [String: AnyObject]?, _ boundary: String) -> String {
+    public static func toForm(dict: [String: AnyObject]?, _ content: Data, _ boundary: String) -> Data {
         if dict == nil || dict?.count == 0 {
-            return ""
+            return "".data(using: .utf8)!
         }
         var dic: [String: AnyObject] = dict!
 
@@ -155,7 +155,7 @@ public class AlibabaCloudCommons {
             str += (headerFile["content"] ?? "") + "\r\n"
         }
         str += "--" + boundary + "--\r\n"
-        return str
+        return str.data(using: .utf8)!
     }
 
     public static func getErrMessage(_ bodyStr: String) -> [String: AnyObject] {
