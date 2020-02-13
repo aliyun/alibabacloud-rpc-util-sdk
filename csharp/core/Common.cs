@@ -163,11 +163,20 @@ namespace AlibabaCloud.Commons
             {
                 return true;
             }
-            if (null == DictUtils.GetDicValue(body, "Code"))
+            object resultCode = DictUtils.GetDicValue(body, "Code");
+            if (resultCode == null)
             {
                 return false;
             }
-            return true;
+            double code;
+            if (double.TryParse(resultCode.ToSafeString(), out code))
+            {
+                return code > 0;
+            }
+            else
+            {
+                return true;
+            }
         }
 
         public static Dictionary<string, string> Query(Dictionary<string, object> dict)
@@ -210,12 +219,13 @@ namespace AlibabaCloud.Commons
             return response.StatusCode < 200 || response.StatusCode >= 300;
         }
 
-        public static string ToForm(Dictionary<string, object> dict, string boundary)
+        public static Stream ToForm(Dictionary<string, object> dict, Stream sourceFile, string boundary)
         {
             if (dict == null)
             {
-                return string.Empty;
+                return sourceFile;
             }
+            MemoryStream formStream = new MemoryStream();
 
             StringBuilder stringBuilder = new StringBuilder();
             object file = DictUtils.GetDicValue(dict, "file");
@@ -247,12 +257,39 @@ namespace AlibabaCloud.Commons
             {
                 Dictionary<string, object> headerFile = (Dictionary<string, object>) file;
                 stringBuilder.Append("--").Append(boundary).Append("\r\n");
-                stringBuilder.Append("Content-Disposition: form-data; name=\"file\"; filename=\"").Append(DictUtils.GetDicValue(headerFile, "filename")).Append("\"\r\n\r\n");
-                stringBuilder.Append("Content-Type: ").Append(DictUtils.GetDicValue(headerFile, "content-type")).Append("\r\n");
-                stringBuilder.Append(DictUtils.GetDicValue(headerFile, "content")).Append("\r\n");
+                stringBuilder.Append("Content-Disposition: form-data; name=\"file\"; filename=\"").Append(DictUtils.GetDicValue(headerFile, "filename")).Append("\"\r\n");
+                stringBuilder.Append("Content-Type: ").Append(DictUtils.GetDicValue(headerFile, "content-type")).Append("\r\n\r\n");
+
+                //write startStr in Stream
+                byte[] sbByte = Encoding.UTF8.GetBytes(stringBuilder.ToString());
+                formStream.Write(sbByte, 0, sbByte.Length);
+
+                //write file in Stream
+                byte[] buffer = new byte[4096];
+                int bytesRFile;
+                while ((bytesRFile = sourceFile.Read(buffer, 0, buffer.Length)) != 0)
+                {
+                    formStream.Write(buffer, 0, bytesRFile);
+                }
+                sourceFile.Flush();
+                sourceFile.Close();
+
+                byte[] bytesFileEnd = Encoding.UTF8.GetBytes("\r\n");
+                formStream.Write(bytesFileEnd, 0, bytesFileEnd.Length);
             }
-            stringBuilder.Append("--").Append(boundary).Append("--\r\n");
-            return stringBuilder.ToString();
+            else
+            {
+                //write stringBuilder in Stream
+                byte[] sbByte = Encoding.UTF8.GetBytes(stringBuilder.ToString());
+                formStream.Write(sbByte, 0, sbByte.Length);
+            }
+
+            //write endStr in Stream
+            string endStr = string.Format("--{0}--\r\n", boundary);
+            byte[] endBytes = Encoding.UTF8.GetBytes(endStr);
+            formStream.Write(endBytes, 0, endBytes.Length);
+
+            return formStream;
         }
 
         public static string GetDate()
@@ -262,10 +299,10 @@ namespace AlibabaCloud.Commons
 
         public static string GetHost(string product, string regionid, string endpoint)
         {
-            if(endpoint == null)
+            if (endpoint == null)
             {
-                string serviceCode = product.Split('_')[0].ToLower();
-                return string.Format("{0}.{1}.aliyuncs.com",serviceCode,regionid);
+                string serviceCode = product.Split('_') [0].ToLower();
+                return string.Format("{0}.{1}.aliyuncs.com", serviceCode, regionid);
             }
             return endpoint;
         }
