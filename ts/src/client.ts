@@ -13,7 +13,6 @@ function parseXML(body: string): any {
     result.err = err;
     result.output = output;
   });
-
   if (result.err) {
     throw result.err;
   }
@@ -84,6 +83,84 @@ function canonicalize(normalized: any[]) {
     fields.push(key + '=' + value);
   }
   return fields.join('&');
+}
+
+export class FileField extends $tea.Model {
+  filename: string;
+  contentType: string;
+  content: Readable;
+  static names(): { [key: string]: string } {
+    return {
+      filename: 'filename',
+      contentType: 'contentType',
+      content: 'content',
+    };
+  }
+
+  static types(): { [key: string]: any } {
+    return {
+      filename: 'string',
+      contentType: 'string',
+      content: 'Readable',
+    };
+  }
+
+  constructor(map?: { [key: string]: any }) {
+    super(map);
+  }
+}
+
+class FileFormStream extends Readable {
+  form: { [key: string]: any };
+  boundary: string;
+  keys: string[];
+  index: number;
+  streaming: boolean;
+  content: Readable;
+
+  constructor(form: { [key: string]: any }, content: Readable, boundary: string) {
+    super();
+    this.form = form;
+    this.keys = Object.keys(form);
+    this.index = 0;
+    this.boundary = boundary;
+    this.streaming = false;
+    this.content = content;
+  }
+
+  _read() {
+    if (this.streaming) {
+      return;
+    }
+    const separator = this.boundary;
+    if (this.index < this.keys.length) {
+      const name = this.keys[this.index];
+      const fieldValue = this.form[name];
+      if (name === 'file') {
+        let body =
+          `--${separator}\r\n` +
+          `Content-Disposition: form-data; name="${name}"; filename=${fieldValue.filename}\r\n` +
+          `Content-Type: ${fieldValue.contentType}\r\n\r\n`;
+        this.push(Buffer.from(body));
+        this.streaming = true;
+        this.content.on('data', (chunk) => {
+          this.push(chunk);
+        });
+        this.content.on('end', () => {
+          this.index++;
+          this.streaming = false;
+        });
+      } else {
+        this.push(Buffer.from(`--${separator}\r\n` +
+          `Content-Disposition: form-data; name="${name}"\r\n\r\n` +
+          `${encodeURIComponent(fieldValue)}\r\n`));
+        this.index++;
+      }
+    } else {
+      this.push(Buffer.from(`\r\n--${separator}--\r\n`));
+      this.push(null);
+    }
+  }
 }
 
 export class RuntimeObject extends $tea.Model {
@@ -172,7 +249,7 @@ export default class Client {
   static getHost(productId: string, regionId: string, endpoint: string): string {
     return endpoint;
   }
-  
+
   static convert(input: $tea.Model, output: $tea.Model): void {
     let inputModel = Object.assign({}, input);
     for (let key in output) {
@@ -229,12 +306,15 @@ export default class Client {
 
   static query(filter: { [key: string]: any }): { [key: string]: string } {
     if (!filter) {
-      return;
+      return {};
     }
-    console.log(filter)
     let ret: { [key: string]: string } = {};
     for (let [key, value] of Object.entries(filter)) {
       key = firstLetterUpper(key);
+      if (typeof value === 'undefined' || value == null) {
+        ret[key] = '';
+        continue;
+      }
       ret[key] = value.toString();
     }
     return ret;
@@ -342,34 +422,8 @@ export default class Client {
     return ret;
   }
 
-  static toForm(body: { [key: string]: any }, boundary: string): string {
-    if (body.UserMeta) {
-      let meta = body.UserMeta;
-      delete body.UserMeta;
-      for (let key in meta) {
-        body[`x-oss-meta-${key}`] = meta[key]
-      }
-    }
-    let separator = `${boundary}`;
-    let reqBody = '';
-    Object.keys(body).forEach((name => {
-      if (name == 'file') {
-        return;
-      }
-      reqBody +=
-        `--${separator}\r\n` +
-        `Content-Disposition: form-data; name="${name}"\r\n\r\n` +
-        `${body[name]}\r\n`;
-    }));
-    if (body.file) {
-      let file = body.file;
-      reqBody += `--${separator}\r\n` +
-        `Content-Disposition: form-data; name="file"; filename="${file["filename"]}"\r\n` +
-        `Content-Type: ${file["content-type"] || 'text/plain'}\r\n\r\n`;
-      reqBody += file["content"];
-    }
-    reqBody += `\r\n--${separator}--\r\n`;
-    return reqBody;
+  static toForm(body: { [key: string]: any }, content: Readable, boundary: string): Readable {
+    return new FileFormStream(body, content, boundary);
   }
 
   static getErrMessage(xml: string): { [key: string]: any } {
@@ -386,7 +440,7 @@ export default class Client {
   }
 
   static empty(val: string): boolean {
-    return val && val.length === 0;
+    return !val;
   }
 
   static equal(val1: string, val2: string): boolean {
