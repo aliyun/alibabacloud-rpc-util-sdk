@@ -29,7 +29,7 @@ module Common {
   static function getUserAgent(userAgent: string): string;
   static function getDate(): string;
   static function parseXml(val: string, response: class): object;
-  static function toForm(val: object, boundary: string): string;
+  static function toForm(val: object, content: readable, boundary: string): readable;
   static function getErrMessage(msg: string): object;
   static function isFail(response: $Response): boolean;
   static function getBoundary(): string;
