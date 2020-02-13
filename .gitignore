@@ -21,3 +21,5 @@ Packages/
 Package.pins
 Package.resolved
 *.xcodeproj
+node_modules/
+coverage/
