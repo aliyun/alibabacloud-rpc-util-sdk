@@ -235,15 +235,31 @@ func Test_XmlUnmarshal(t *testing.T) {
 }
 
 func Test_ToForm(t *testing.T) {
+	content := strings.NewReader("test")
 	body := map[string]interface{}{
+		"UserMeta": map[string]string{
+			"common": "ok",
+		},
+		"ak":   "accesskey",
+		"file": map[string]string{},
+	}
+	res := ToForm(body, content, GetBoundary())
+	byt, err := ioutil.ReadAll(res)
+	utils.AssertNil(t, err)
+	utils.AssertContains(t, string(byt), `name="x-oss-meta-common"`)
+
+	body = map[string]interface{}{
 		"UserMeta": map[string]string{
 			"common": "ok",
 		},
 		"ak": "accesskey",
 		"file": map[string]string{
-			"filename": "common",
+			"filename":     "a.jpg",
+			"Content-Type": "jpg",
 		},
 	}
-	res := ToForm(body, GetBoundary())
-	utils.AssertContains(t, res, `name="x-oss-meta-common"`)
+	res = ToForm(body, content, GetBoundary())
+	byt, err = ioutil.ReadAll(res)
+	utils.AssertNil(t, err)
+	utils.AssertContains(t, string(byt), `name="x-oss-meta-common"`)
 }
