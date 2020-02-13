@@ -1,2 +1,6 @@
+2020-02-13 Version: v1.1.0
+- Modify ToForm.
+- Change package name 'common' to 'service'.
+
 2020-02-04 Version: v1.0.0
 - Util for rpc sdk.
