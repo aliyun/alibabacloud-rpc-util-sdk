@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -38,10 +39,18 @@ public class CommonTest {
     @Test
     public void hasErrorTest() {
         Map<String, Object> map = new HashMap<>();
-        Assert.assertFalse(Common.hasError(null));
+        Assert.assertTrue(Common.hasError(null));
+        map.put("Code", "0");
         Assert.assertFalse(Common.hasError(map));
-        map.put("Code", "test");
+
+        map.put("Code", "400");
         Assert.assertTrue(Common.hasError(map));
+
+        map.put("Code", "notFound");
+        Assert.assertTrue(Common.hasError(map));
+
+        map.put("Code", null);
+        Assert.assertFalse(Common.hasError(map));
     }
 
     @Test
@@ -127,21 +136,26 @@ public class CommonTest {
 
     @Test
     public void toFormTest() throws Exception {
-        byte[] result = Common.toForm(null, null);
-        Assert.assertEquals(0, result.length);
+        InputStream result = Common.toForm(null, null,null);
+        Assert.assertNull(result);
         Map<String, Object> map = new HashMap<>();
         map.put("nullTest", null);
         map.put("bodyTest", "test");
-        result = Common.toForm(map, "123456");
+        result = Common.toForm(map, null,"123456");
+        byte[] bytes = new byte[result.available()];
+        result.read(bytes);
         Assert.assertEquals("--123456\r\nContent-Disposition: form-data; name=\"bodyTest\"\r\n\r\ntest\r\n" +
-                "--123456--\r\n", new String(result, "UTF-8"));
+                "--123456--\r\n", new String(bytes, "UTF-8"));
 
         TargetClass targetClass = new TargetClass();
         map.put("file", targetClass);
         Map<String, String> userMeta = new HashMap<>();
         userMeta.put("meta", "test");
         map.put("UserMeta", userMeta);
-        result = Common.toForm(map, "123456");
+        InputStream source = new ByteArrayInputStream("test".getBytes("UTF-8"));
+        result = Common.toForm(map, source,"123456");
+        bytes = new byte[result.available()];
+        result.read(bytes);
         Assert.assertEquals("--123456\r\n" +
                 "Content-Disposition: form-data; name=\"x-oss-meta-meta\"\r\n\r\n" +
                 "test\r\n" +
@@ -149,10 +163,10 @@ public class CommonTest {
                 "Content-Disposition: form-data; name=\"bodyTest\"\r\n\r\n" +
                 "test\r\n" +
                 "--123456\r\n" +
-                "Content-Disposition: form-data; name=\"file\"; filename=\"null\"\r\n\r\n" +
-                "Content-Type: null\r\n" +
-                "null\r\n" +
-                "--123456--\r\n", new String(result, "utf-8"));
+                "Content-Disposition: form-data; name=\"file\"; filename=\"null\"\r\n" +
+                "Content-Type: null\r\n\r\n" +
+                "test\r\n" +
+                "--123456--\r\n", new String(bytes, "utf-8"));
     }
 
     @Test

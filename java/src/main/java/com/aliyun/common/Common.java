@@ -107,9 +107,11 @@ public class Common {
         return false;
     }
 
-    public static byte[] toForm(Map<String, Object> map, String boundary) throws UnsupportedEncodingException, IllegalAccessException {
+    public static InputStream toForm(Map<String, Object> map, InputStream sourceFile, String boundary) throws Exception {
+        InputStream is;
+        OutputStream os = new ByteArrayOutputStream();
         if (null == map) {
-            return "".getBytes("UTF-8");
+            return sourceFile;
         }
         StringBuilder stringBuilder = new StringBuilder();
         Object file = map.remove("file");
@@ -132,12 +134,25 @@ public class Common {
         if (null != file) {
             Map<String, Object> headerFile = ((TeaModel) file).toMap();
             stringBuilder.append("--").append(boundary).append("\r\n");
-            stringBuilder.append("Content-Disposition: form-data; name=\"file\"; filename=\"").append(headerFile.get("filename")).append("\"\r\n\r\n");
-            stringBuilder.append("Content-Type: ").append(headerFile.get("content-type")).append("\r\n");
-            stringBuilder.append(headerFile.get("content")).append("\r\n");
+            stringBuilder.append("Content-Disposition: form-data; name=\"file\"; filename=\"").append(headerFile.get("filename")).append("\"\r\n");
+            stringBuilder.append("Content-Type: ").append(headerFile.get("content-type")).append("\r\n\r\n");
+            os.write(stringBuilder.toString().getBytes("UTF-8"));
+            int index;
+            byte[] bufferOut = new byte[4096];
+            while ((index = sourceFile.read(bufferOut)) != -1) {
+                os.write(bufferOut, 0, index);
+            }
+            sourceFile.close();
+            os.write("\r\n".getBytes("UTF-8"));
+        } else {
+            os.write(stringBuilder.toString().getBytes("UTF-8"));
         }
-        stringBuilder.append("--").append(boundary).append("--\r\n");
-        return stringBuilder.toString().getBytes("UTF-8");
+        byte[] endData = ("--" + boundary + "--\r\n").getBytes();
+        os.write(endData);
+        os.flush();
+        byte[] bytes = ((ByteArrayOutputStream) os).toByteArray();
+        is = new ByteArrayInputStream(bytes);
+        return is;
     }
 
     public static String getDate() {
@@ -237,9 +252,18 @@ public class Common {
 
     public static boolean hasError(Map<String, Object> body) {
         if (null == body) {
-            return false;
+            return true;
         }
-        return null != body.get("Code");
+        try {
+            Object resultCode = body.get("Code");
+            if (null == resultCode) {
+                return false;
+            }
+            String code = String.valueOf(resultCode);
+            return Double.parseDouble(code) > 0;
+        } catch (Exception e) {
+            return true;
+        }
     }
 
     public static void convert(TeaModel source, TeaModel target) throws IllegalAccessException, InstantiationException {
