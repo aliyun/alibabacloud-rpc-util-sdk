@@ -1,7 +1,7 @@
 {
 	"scope": "alibabacloud",
 	"name": "Common",
-	"version": "0.0.7",
+	"version": "0.0.8",
 	"main": "./main.tea",
 	"releases": {
 		"go": "github.com/aliyun/alibabacloud-rpc-util-sdk/golang/service:v1.1.0",
