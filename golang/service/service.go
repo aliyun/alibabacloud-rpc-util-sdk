@@ -373,3 +373,13 @@ func XmlUnmarshal(body []byte, result interface{}) (interface{}, error) {
 	}
 	return nil, nil
 }
+
+func GetOpenPlatFormEndpoint(endpoint, regionId string) string {
+	if regionId == "" {
+		return endpoint
+	} else {
+		strs := strings.Split(endpoint, ".")
+		strs[0] = strs[0] + "." + regionId
+		return strings.Join(strs, ".")
+	}
+}

@@ -263,3 +263,11 @@ func Test_ToForm(t *testing.T) {
 	utils.AssertNil(t, err)
 	utils.AssertContains(t, string(byt), `name="x-oss-meta-common"`)
 }
+
+func Test_GetOpenPlatFormEndpoint(t *testing.T) {
+	endpoint := GetOpenPlatFormEndpoint("openplatform.aliyuncs.com", "")
+	utils.AssertEqual(t, `openplatform.aliyuncs.com`, endpoint)
+
+	endpoint = GetOpenPlatFormEndpoint("openplatform.aliyuncs.com", "cn-hangzhou")
+	utils.AssertEqual(t, `openplatform.cn-hangzhou.aliyuncs.com`, endpoint)
+}
