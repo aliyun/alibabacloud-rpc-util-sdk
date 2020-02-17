@@ -269,5 +269,8 @@ func Test_GetOpenPlatFormEndpoint(t *testing.T) {
 	utils.AssertEqual(t, `openplatform.aliyuncs.com`, endpoint)
 
 	endpoint = GetOpenPlatFormEndpoint("openplatform.aliyuncs.com", "cn-hangzhou")
-	utils.AssertEqual(t, `openplatform.cn-hangzhou.aliyuncs.com`, endpoint)
+	utils.AssertEqual(t, `openplatform.aliyuncs.com`, endpoint)
+
+	endpoint = GetOpenPlatFormEndpoint("openplatform.aliyuncs.com", "ap-northeast-1")
+	utils.AssertEqual(t, `openplatform.ap-northeast-1.aliyuncs.com`, endpoint)
 }
