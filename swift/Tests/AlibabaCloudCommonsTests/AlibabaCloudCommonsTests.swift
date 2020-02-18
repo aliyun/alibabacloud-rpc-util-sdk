@@ -125,6 +125,29 @@ final class AlibabaCloudCommonsTests: XCTestCase {
         }
     }
 
+    func testToForm() {
+        let data: Data = "string".data(using: .utf8)!
+        XCTAssertEqual("".data(using: .utf8), AlibabaCloudCommons.toForm(dict: nil, data, "boundary"))
+        var dict: [String: AnyObject] = [String: AnyObject]()
+        dict["foo"] = "bar" as AnyObject
+
+        var result: Data = AlibabaCloudCommons.toForm(dict: dict, data, "boundary")
+        var str: String = String(data: result, encoding: .utf8) ?? ""
+        XCTAssertEqual(str, "--boundary\r\nContent-Disposition: form-data; name=\"x-oss-meta-foo\"\r\n\r\nbar\r\n--boundary--\r\n")
+
+        var headerFile: [String: AnyObject] = [String: AnyObject]()
+        headerFile["content-type"] = "json" as AnyObject
+        headerFile["filename"] = "filename" as AnyObject
+        headerFile["content"] = "content" as AnyObject
+        var userMeta: [String: String] = [String: String]()
+        userMeta["test"] = "test"
+        dict["file"] = headerFile as AnyObject
+        dict["UserMeta"] = userMeta as AnyObject
+        result = AlibabaCloudCommons.toForm(dict: dict, data, "boundary")
+        str = String(data: result, encoding: .utf8) ?? ""
+        XCTAssertEqual(str, "--boundary\r\nContent-Disposition: form-data; name=\"x-oss-meta-test\"\r\n\r\ntest\r\n--boundary\r\nContent-Disposition: form-data; name=\"x-oss-meta-foo\"\r\n\r\nbar\r\n--boundary\r\nContent-Disposition: form-data; name=\"file\"; filename=\"filename\"\r\n\r\nContent-Type: jsoncontent\r\n--boundary--\r\n")
+    }
+
     func testGetErrMessage() {
         let xml: String = """
                           <?xml version='1.0' encoding='UTF-8'?><Error>
@@ -151,27 +174,18 @@ final class AlibabaCloudCommonsTests: XCTestCase {
         }
     }
 
-    func testToForm() {
-        let data: Data = "string".data(using: .utf8)!
-        XCTAssertEqual("".data(using: .utf8), AlibabaCloudCommons.toForm(dict: nil, data, "boundary"))
-        var dict: [String: AnyObject] = [String: AnyObject]()
-        dict["foo"] = "bar" as AnyObject
+    func testGetBoundary() {
+        XCTAssertEqual(32, AlibabaCloudCommons.getBoundary().lengthOfBytes(using: .utf8))
+    }
 
-        var result: Data = AlibabaCloudCommons.toForm(dict: dict, data, "boundary")
-        var str: String = String(data: result, encoding: .utf8) ?? ""
-        XCTAssertEqual(str, "--boundary\r\nContent-Disposition: form-data; name=\"x-oss-meta-foo\"\r\n\r\nbar\r\n--boundary--\r\n")
+    func testEmpty() {
+        XCTAssertTrue(AlibabaCloudCommons.empty(""))
+        XCTAssertFalse(AlibabaCloudCommons.empty("not empty"))
+    }
 
-        var headerFile: [String: AnyObject] = [String: AnyObject]()
-        headerFile["content-type"] = "json" as AnyObject
-        headerFile["filename"] = "filename" as AnyObject
-        headerFile["content"] = "content" as AnyObject
-        var userMeta: [String: String] = [String: String]()
-        userMeta["test"] = "test"
-        dict["file"] = headerFile as AnyObject
-        dict["UserMeta"] = userMeta as AnyObject
-        result = AlibabaCloudCommons.toForm(dict: dict, data, "boundary")
-        str = String(data: result, encoding: .utf8) ?? ""
-        XCTAssertEqual(str, "--boundary\r\nContent-Disposition: form-data; name=\"x-oss-meta-test\"\r\n\r\ntest\r\n--boundary\r\nContent-Disposition: form-data; name=\"x-oss-meta-foo\"\r\n\r\nbar\r\n--boundary\r\nContent-Disposition: form-data; name=\"file\"; filename=\"filename\"\r\n\r\nContent-Type: jsoncontent\r\n--boundary--\r\n")
+    func testEqual() {
+        XCTAssertTrue(AlibabaCloudCommons.equal("equal", "equal"))
+        XCTAssertFalse(AlibabaCloudCommons.equal("a", "b"))
     }
 
     func testGetOpenPlatFormEndpoint() {
@@ -193,6 +207,26 @@ final class AlibabaCloudCommonsTests: XCTestCase {
 
     static var allTests = [
         ("testReadAsString", testReadAsString),
+        ("testGetEndpoint", testGetEndpoint),
+        ("testGetHost", testGetHost),
+        ("testConvert", testConvert),
+        ("testGetNonce", testGetNonce),
+        ("testGetSignature", testGetSignature),
+        ("testJson", testJson),
+        ("testHasError", testHasError),
+        ("testGetTimestamp", testGetTimestamp),
+        ("testDefault", testDefault),
+        ("testDefaultNumber", testDefaultNumber),
+        ("testGetUserAgent", testGetUserAgent),
+        ("testGetDate", testGetDate),
+        ("testParseXml", testParseXml),
+        ("testToForm", testToForm),
+        ("testGetErrMessage", testGetErrMessage),
+        ("testIsFail", testIsFail),
+        ("testGetBoundary", testGetBoundary),
+        ("testEmpty", testEmpty),
+        ("testEqual", testEqual),
+        ("testGetOpenPlatFormEndpoint", testGetOpenPlatFormEndpoint),
     ]
 }
 

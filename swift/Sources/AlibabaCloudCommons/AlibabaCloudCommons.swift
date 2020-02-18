@@ -184,8 +184,7 @@ public class AlibabaCloudCommons {
     }
 
     public static func getBoundary() -> String {
-        let boundary: CLong = CLong(arc4random() / UInt32.max) * CLong.max
-        return boundary.toString()
+        "1" + String.randomString(len: 31, randomDict: "0123456789")
     }
 
     public static func empty(_ str: String) -> Bool {

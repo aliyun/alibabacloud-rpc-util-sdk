@@ -10,9 +10,7 @@ extension Int {
 }
 
 extension String {
-    private static let randomDict = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-
-    static func randomString(len: Int) -> String {
+    static func randomString(len: Int, randomDict: String = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ") -> String {
         var ranStr = ""
         for _ in 0..<len {
             let index = Int(arc4random_uniform(UInt32(randomDict.count)))
