@@ -11,6 +11,7 @@ public class AlibabaCloudCommons {
     internal static var _defaultUserAgent: String = ""
     public static var clientVersion: String = "UnknownClientVersion"
     public static var coreVersion: String = "UnknownCoreVersion"
+    public static var supportedRegionId: [String] = ["ap-southeast-1", "ap-northeast-1", "eu-central-1", "cn-hongkong", "ap-south-1"]
 
     public static func readAsString(_ data: Data) -> String {
         String(data: data, encoding: .utf8) ?? ""
@@ -178,6 +179,16 @@ public class AlibabaCloudCommons {
 
     public static func equal(_ val1: String, _ val2: String) -> Bool {
         val1 == val2
+    }
+
+    public static func getOpenPlatFormEndpoint(_ endpoint: String, _ regionId: String) -> String {
+        let region: String = regionId.lowercased()
+        if !region.isEmpty && AlibabaCloudCommons.supportedRegionId.contains(region) {
+            var tmp: [String] = endpoint.split(separator: ".").map(String.init)
+            tmp[0] = tmp[0] + "." + region
+            return tmp.joined(separator: ".")
+        }
+        return endpoint
     }
 
     private static func getDefaultUserAgent() -> String {
