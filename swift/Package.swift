@@ -14,14 +14,15 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/krzyzanowskim/CryptoSwift.git", from: "1.3.0"),
         .package(url: "https://github.com/aliyun/tea-swift.git", from: "0.1.0"),
-        .package(url: "https://github.com/AxiosCros/SwiftyXMLParser.git", from: "5.2.0-beta")
+        .package(url: "https://github.com/AxiosCros/SwiftyXMLParser.git", from: "5.2.0-beta"),
+        .package(url: "https://github.com/SwiftyJSON/SwiftyJSON.git", from: "5.0.0")
     ],
     targets: [
         .target(
             name: "AlibabaCloudCommons",
-            dependencies: ["CryptoSwift", "Tea", "SwiftyXMLParser"]),
+            dependencies: ["CryptoSwift", "Tea", "SwiftyXMLParser", "SwiftyJSON"]),
         .testTarget(
             name: "AlibabaCloudCommonsTests",
-            dependencies: ["CryptoSwift", "Tea"])
+            dependencies: ["CryptoSwift", "Tea", "SwiftyJSON"])
     ]
 )
