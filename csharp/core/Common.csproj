@@ -49,7 +49,6 @@
   
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
-    <PackageReference Include="Aliyun.Credentials" Version="0.0.3" />
   </ItemGroup>
   
 </Project>

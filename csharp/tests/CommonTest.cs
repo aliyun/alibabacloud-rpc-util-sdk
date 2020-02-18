@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Text;
-using Xunit;
-using AlibabaCloud.Commons;
-using tests.Models;
-using Tea;
 using System.Net;
+using System.Text;
+using AlibabaCloud.Commons;
 using Moq;
+using Tea;
+using tests.Models;
+using Xunit;
 
 namespace tests
 {
@@ -47,15 +46,14 @@ namespace tests
             {
                 RequestId = "test",
                 Dict = new Dictionary<string, object>
-                {
-                    { "key","value" },
-                    { "testKey","testValue"}
+                { { "key", "value" },
+                { "testKey", "testValue" }
                 },
                 NoMap = 1,
                 SubModel = new TestConvertModel.TestConvertSubModel
                 {
-                    Id = 2,
-                    RequestId = "subTest"
+                Id = 2,
+                RequestId = "subTest"
                 }
             };
 
@@ -117,7 +115,7 @@ namespace tests
             mockHttpWebResponse.Setup(p => p.Headers).Returns(new WebHeaderCollection());
             mockHttpWebResponse.Setup(p => p.GetResponseStream()).Returns(new MemoryStream(Encoding.UTF8.GetBytes("{\"test\":\"value\"}")));
             TeaResponse teaResponse = new TeaResponse(mockHttpWebResponse.Object);
-            Assert.Equal("value", Common.Json(teaResponse)["test"]);
+            Assert.Equal("value", Common.Json(teaResponse) ["test"]);
         }
 
         [Fact]
@@ -135,6 +133,16 @@ namespace tests
             request.Query.Add("testKey", "testValue");
             Assert.Equal("pathName?key=value&testKey=testValue", Common.BuildUrl(request));
 
+        }
+
+        [Fact]
+        public void Test_GetOpenPlatFormEndpoint()
+        {
+            Assert.Equal("openplatform.aliyuncs.com", Common.GetOpenPlatFormEndpoint("openplatform.aliyuncs.com", ""));
+
+            Assert.Equal("openplatform.aliyuncs.com", Common.GetOpenPlatFormEndpoint("openplatform.aliyuncs.com", "cn-hangzhou"));
+
+            Assert.Equal("openplatform.ap-northeast-1.aliyuncs.com", Common.GetOpenPlatFormEndpoint("openplatform.aliyuncs.com", "ap-northeast-1"));
         }
     }
 }
