@@ -458,5 +458,20 @@ namespace AlibabaCloud.Commons
             return dic;
         }
 
+        public static string GetOpenPlatFormEndpoint(string endpoint, string regionId)
+        {
+            string[] supportRegionId = { "ap-southeast-1", "ap-northeast-1", "eu-central-1", "cn-hongkong", "ap-south-1" };
+            bool isExist = supportRegionId.Contains(regionId.ToLower());
+
+            if (isExist)
+            {
+                string[] strs = endpoint.Split('.');
+                strs[0] = strs[0] + "." + regionId;
+                return string.Join(".", strs);
+            }
+
+            return endpoint;
+        }
+
     }
 }
