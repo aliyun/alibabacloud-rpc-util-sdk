@@ -54,7 +54,7 @@ extension String {
 }
 
 extension Date {
-    func toString(format: String = "yyyy-MM-dd'T'HH:mm:ssZ") -> String {
+    func toString(format: String = "yyyy-MM-dd'T'HH:mm:ss'Z'") -> String {
         dateFormatter(format: format).string(from: self)
     }
 
@@ -66,4 +66,3 @@ extension Date {
         TimeInterval(self.timeIntervalSince1970)
     }
 }
-

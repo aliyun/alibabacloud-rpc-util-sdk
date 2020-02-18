@@ -8,9 +8,8 @@ public enum AliababaCloudCommonsException: Error {
 }
 
 public class AlibabaCloudCommons {
-    internal static var _defaultUserAgent: String = ""
-    public static var clientVersion: String = "UnknownClientVersion"
-    public static var coreVersion: String = "UnknownCoreVersion"
+    public static var _defaultUserAgent: String = ""
+    public static var packageVersion: String = "0.1.0"
     public static var supportedRegionId: [String] = ["ap-southeast-1", "ap-northeast-1", "eu-central-1", "cn-hongkong", "ap-south-1"]
 
     public static func readAsString(_ data: Data) -> String {
@@ -62,19 +61,19 @@ public class AlibabaCloudCommons {
 
     public static func json(_ response: TeaResponse) -> [String: AnyObject] {
         guard let data = try! JSONSerialization.jsonObject(with: response.data) as? [String: AnyObject] else {
-            return [String: AnyObject]();
+            return [String: AnyObject]()
         }
-        return data;
+        return data
     }
 
     public static func hasError(_ dict: [String: AnyObject]? = nil) -> Bool {
         if (nil == dict) {
-            return true;
+            return true
         }
         if (nil == dict?["Code"]) {
-            return false;
+            return false
         }
-        return true;
+        return true
     }
 
     public static func getTimestamp() -> TimeInterval {
@@ -89,7 +88,7 @@ public class AlibabaCloudCommons {
         return outDict
     }
 
-    func _default(_ str: String, _ defaultStr: String) -> String {
+    public static func _default(_ str: String, _ defaultStr: String) -> String {
         let tmp = str.trimmingCharacters(in: .whitespaces)
         if tmp.isEmpty {
             return defaultStr
@@ -97,7 +96,7 @@ public class AlibabaCloudCommons {
         return str
     }
 
-    public func defaultNumber(_ number: Int, _ defaultNumber: Int) -> Int {
+    public static func defaultNumber(_ number: Int, _ defaultNumber: Int) -> Int {
         if number > 0 {
             return number
         }
@@ -105,7 +104,7 @@ public class AlibabaCloudCommons {
     }
 
     public static func getUserAgent(_ userAgent: String) -> String {
-        _defaultUserAgent + " " + userAgent;
+        AlibabaCloudCommons.getDefaultUserAgent() + " " + userAgent
     }
 
     public static func getDate() -> String {
@@ -159,13 +158,29 @@ public class AlibabaCloudCommons {
         return str.data(using: .utf8)!
     }
 
-    public static func getErrMessage(_ bodyStr: String) -> [String: AnyObject] {
-        [String: AnyObject]()
+    public static func getErrMessage(_ bodyStr: String) -> [String: String?] {
+        do {
+            let dict = try AlibabaCloudCommons.parseXml(bodyStr)
+            let code: String? = dict["Error"]["Code"].text
+            let msg: String? = dict["Error"]["Message"].text
+            let requestId: String? = dict["Error"]["RequestId"].text
+            let hostId: String? = dict["Error"]["HostId"].text
+            let err: [String: String?] = [
+                "Code": code,
+                "Message": msg,
+                "RequestId": requestId,
+                "HostId": hostId
+            ]
+            return err
+        } catch {
+            print("parse xml error : " + bodyStr)
+            return [String: String]()
+        }
     }
 
     public static func isFail(_ response: TeaResponse) -> Bool {
         let statusCode: Int = Int(response.statusCode) ?? 0
-        return 200 <= statusCode && statusCode < 300
+        return 200 > statusCode && statusCode >= 300
     }
 
     public static func getBoundary() -> String {
@@ -192,12 +207,12 @@ public class AlibabaCloudCommons {
     }
 
     private static func getDefaultUserAgent() -> String {
-        var defaultUserAgent: String = ""
-        let os = ProcessInfo().operatingSystemVersion
-        let osVersion: String = String(os.majorVersion) + "." + String(os.minorVersion) + "." + String(os.patchVersion)
-        defaultUserAgent = "Alibaba Cloud (" + osVersion + ") "
-        defaultUserAgent += clientVersion
-        defaultUserAgent += " Core/" + coreVersion
-        return defaultUserAgent;
+        if AlibabaCloudCommons._defaultUserAgent.isEmpty {
+            var defaultUserAgent: String = ""
+            defaultUserAgent += osName() + " " + version()
+            return defaultUserAgent
+        }
+        return AlibabaCloudCommons._defaultUserAgent
     }
+
 }

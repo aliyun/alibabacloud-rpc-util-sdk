@@ -3,6 +3,7 @@ import CryptoSwift
 import PromiseKit
 import Alamofire
 import AwaitKit
+import SwiftyJSON
 
 func dateFormatter(format: String = "yyyy-MM-dd'T'HH:mm:ssZ") -> DateFormatter {
     let formatter = DateFormatter()
@@ -82,4 +83,50 @@ func stsRequest(accessKeySecret: String, connectTimeout: Double, readTimeout: Do
     let promise = sessionManage.request(url, method: HTTPMethod.get).response()
     let response: DefaultDataResponse = try! await(promise)
     return response
+}
+
+func jsonEncode(obj: Any) -> String {
+    let json = JSON(obj)
+    return json.rawString(.utf8, options: .fragmentsAllowed) ?? ""
+}
+
+func osName() -> String {
+    let osNameVersion: String = {
+        let version = ProcessInfo.processInfo.operatingSystemVersion
+        let versionString = "\(version.majorVersion).\(version.minorVersion).\(version.patchVersion)"
+
+        let osName: String = {
+            #if os(iOS)
+            return "iOS"
+            #elseif os(watchOS)
+            return "watchOS"
+            #elseif os(tvOS)
+            return "tvOS"
+            #elseif os(macOS)
+            return "OSX"
+            #elseif os(Linux)
+            return "Linux"
+            #else
+            return "Unknown"
+            #endif
+        }()
+
+        return "\(osName)/\(versionString)"
+    }()
+    return osNameVersion
+}
+
+func version() -> String {
+    let package: String = {
+        guard
+                let afInfo = Bundle(for: AlibabaCloudCommons.self).infoDictionary,
+                let build = afInfo["CFBundleShortVersionString"],
+                let name = afInfo["CFBundleName"]
+                else {
+            return "Unknown"
+        }
+
+        return "\(name)/\(build)"
+    }()
+    return package
 }

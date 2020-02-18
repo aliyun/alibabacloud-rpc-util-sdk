@@ -92,6 +92,65 @@ final class AlibabaCloudCommonsTests: XCTestCase {
         XCTAssertTrue(end - now >= 0)
     }
 
+    func testDefault() {
+        XCTAssertEqual("default", AlibabaCloudCommons._default("", "default"))
+        XCTAssertEqual("default", AlibabaCloudCommons._default("  ", "default"))
+        XCTAssertEqual("real", AlibabaCloudCommons._default("real", "default"))
+    }
+
+    func testDefaultNumber() {
+        XCTAssertEqual(1, AlibabaCloudCommons.defaultNumber(0, 1))
+        XCTAssertEqual(200, AlibabaCloudCommons.defaultNumber(200, 1))
+    }
+
+    func testGetUserAgent() {
+        let userAgent: String = AlibabaCloudCommons.getUserAgent("CustomizedUserAgent")
+        print(userAgent)
+        XCTAssertTrue(userAgent.contains("CustomizedUserAgent"))
+    }
+
+    func testGetDate() {
+        XCTAssertEqual(20, AlibabaCloudCommons.getDate().lengthOfBytes(using: .utf8))
+    }
+
+    func testParseXml() {
+        let xml: String = "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"no\"?><Tests><Test>foo</Test></Tests>"
+        let target: String? = "foo"
+        do {
+            let r = try AlibabaCloudCommons.parseXml(xml)
+            XCTAssertEqual(target, r["Tests"]["Test"].text)
+        } catch {
+            // Not throw exception
+            XCTAssertTrue(false)
+        }
+    }
+
+    func testGetErrMessage() {
+        let xml: String = """
+                          <?xml version='1.0' encoding='UTF-8'?><Error>
+                          <RequestId>request-id</RequestId><HostId>host-id</HostId><Code>request-code</Code><Message>message</Message></Error>
+                          """;
+        let r: [String: String?] = AlibabaCloudCommons.getErrMessage(xml)
+        XCTAssertEqual("message", r["Message"])
+        XCTAssertEqual("request-code", r["Code"])
+        XCTAssertEqual("request-id", r["RequestId"])
+        XCTAssertEqual("host-id", r["HostId"])
+    }
+
+    func testIsFail() {
+        let sm: SessionManager = Alamofire.SessionManager(configuration: URLSessionConfiguration.default)
+        let queue: DispatchQueue = DispatchQueue(label: "AlibabaCloudCommonsTests.TestsQueue")
+        let promise = sm.request("https://httpbin.org/get?foo=bar", method: HTTPMethod.get).response(queue: queue)
+        do {
+            let response: DefaultDataResponse = try await(promise)
+            let teaResponse: TeaResponse = TeaResponse(response)
+            print(teaResponse.statusCode)
+            XCTAssertFalse(AlibabaCloudCommons.isFail(teaResponse))
+        } catch {
+            XCTAssertTrue(false)
+        }
+    }
+
     func testToForm() {
         let data: Data = "string".data(using: .utf8)!
         XCTAssertEqual("".data(using: .utf8), AlibabaCloudCommons.toForm(dict: nil, data, "boundary"))
