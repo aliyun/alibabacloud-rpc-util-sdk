@@ -115,6 +115,23 @@ final class AlibabaCloudCommonsTests: XCTestCase {
         XCTAssertEqual(str, "--boundary\r\nContent-Disposition: form-data; name=\"x-oss-meta-test\"\r\n\r\ntest\r\n--boundary\r\nContent-Disposition: form-data; name=\"x-oss-meta-foo\"\r\n\r\nbar\r\n--boundary\r\nContent-Disposition: form-data; name=\"file\"; filename=\"filename\"\r\n\r\nContent-Type: jsoncontent\r\n--boundary--\r\n")
     }
 
+    func testGetOpenPlatFormEndpoint() {
+        let endpoint: String = "fake.domain.com"
+        var regionId: String = ""
+
+        // regionId is empty
+        XCTAssertEqual("fake.domain.com", AlibabaCloudCommons.getOpenPlatFormEndpoint(endpoint, regionId))
+        // regionId is invalid
+        regionId = "invalid-regionId"
+        XCTAssertEqual("fake.domain.com", AlibabaCloudCommons.getOpenPlatFormEndpoint(endpoint, regionId))
+        // regionId is valid but have upper character
+        regionId = "cn-Hongkong"
+        XCTAssertEqual("fake.cn-hongkong.domain.com", AlibabaCloudCommons.getOpenPlatFormEndpoint(endpoint, regionId))
+        // valid regionId
+        regionId = "cn-hongkong"
+        XCTAssertEqual("fake.cn-hongkong.domain.com", AlibabaCloudCommons.getOpenPlatFormEndpoint(endpoint, regionId))
+    }
+
     static var allTests = [
         ("testReadAsString", testReadAsString),
     ]
