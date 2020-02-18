@@ -247,4 +247,13 @@ public class CommonTest {
     public void parseXmlTest() throws Exception{
         Assert.assertEquals(0, Common.parseXml(null, null).size());
     }
+
+    @Test
+    public void getOpenPlatFormEndpointTest() {
+        Assert.assertEquals("test", Common.getOpenPlatFormEndpoint("test", ""));
+        Assert.assertEquals("test", Common.getOpenPlatFormEndpoint("test", "region"));
+        Assert.assertEquals("endpoint.cn-hongkong.test",
+                Common.getOpenPlatFormEndpoint("endpoint.test", "cn-hongkong"));
+
+    }
 }

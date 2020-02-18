@@ -290,4 +290,24 @@ public class Common {
             field.set(target, field.get(outPut));
         }
     }
+
+    public static String getOpenPlatFormEndpoint(String endpoint, String regionId) {
+        if (StringUtils.isEmpty(regionId)) {
+            return endpoint;
+        }
+        final List<String> regionIds = Arrays.asList("ap-southeast-1", "ap-northeast-1", "eu-central-1", "cn-hongkong", "ap-south-1");
+        boolean ifExist = false;
+        for (String region : regionIds) {
+            if (region.equals(regionId.toLowerCase())) {
+                ifExist = true;
+            }
+        }
+        if (ifExist) {
+            String[] strs = endpoint.split("\\.");
+            strs[0] = strs[0] + "." + regionId;
+            return String.join(".", strs);
+        } else {
+            return endpoint;
+        }
+    }
 }
