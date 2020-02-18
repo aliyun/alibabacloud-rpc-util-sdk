@@ -375,8 +375,14 @@ func XmlUnmarshal(body []byte, result interface{}) (interface{}, error) {
 }
 
 func GetOpenPlatFormEndpoint(endpoint, regionId string) string {
-	supportRegionId := "ap-southeast-1,ap-northeast-1,eu-central-1,cn-hongkong,ap-south-1"
-	if regionId != "" && strings.Index(supportRegionId, regionId) != -1 {
+	supportRegionId := []string{"ap-southeast-1", "ap-northeast-1", "eu-central-1", "cn-hongkong", "ap-south-1"}
+	ifExist := false
+	for _, value := range supportRegionId {
+		if value == strings.ToLower(regionId) {
+			ifExist = true
+		}
+	}
+	if regionId != "" && ifExist {
 		strs := strings.Split(endpoint, ".")
 		strs[0] = strs[0] + "." + regionId
 		return strings.Join(strs, ".")
