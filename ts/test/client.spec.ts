@@ -439,6 +439,14 @@ describe('base client', function () {
     assert.strictEqual(BaseClient.equal('1', '1'), true)
     assert.strictEqual(BaseClient.equal('1', ''), false)
   });
+  it('getOpenPlatFormEndpoint should ok', async function () {
+    assert.equal(BaseClient.getOpenPlatFormEndpoint("openplatform.aliyuncs.com", undefined), `openplatform.aliyuncs.com`);
+    assert.equal(BaseClient.getOpenPlatFormEndpoint("openplatform.aliyuncs.com", ""), `openplatform.aliyuncs.com`);
+    assert.equal(BaseClient.getOpenPlatFormEndpoint("openplatform.aliyuncs.com", "cn-hangzhou"), `openplatform.aliyuncs.com`);
+    assert.equal(BaseClient.getOpenPlatFormEndpoint("openplatform.aliyuncs.com", "ap-northeast-1"), `openplatform.ap-northeast-1.aliyuncs.com`);
+    assert.equal(BaseClient.getOpenPlatFormEndpoint("openplatform.aliyuncs.com", "Ap-northeast-1"), `openplatform.ap-northeast-1.aliyuncs.com`);
+    assert.equal(BaseClient.getOpenPlatFormEndpoint("openplatform.aliyuncs.com", "northeast-1"), `openplatform.aliyuncs.com`);
+  });
 
   after(() => {
     server.close();

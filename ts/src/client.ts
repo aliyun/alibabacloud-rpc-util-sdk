@@ -446,5 +446,15 @@ export default class Client {
   static equal(val1: string, val2: string): boolean {
     return val1 === val2;
   }
+  static getOpenPlatFormEndpoint(endpoint: string, regionId: string): string {
+    const supportRegionId = ['ap-southeast-1', 'ap-northeast-1', 'eu-central-1', 'cn-hongkong', 'ap-south-1'];
+    if (regionId && regionId.length && supportRegionId.indexOf(regionId.toLowerCase()) != -1) {
+      let strs = endpoint.split('.');
+      strs[0] = strs[0] + "." + regionId.toLowerCase();
+      return strs.join(".");
+    } else {
+      return endpoint
+    }
+  }
 
 }
