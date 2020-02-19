@@ -22,7 +22,7 @@ import (
 	"github.com/aliyun/alibabacloud-rpc-util-sdk/golang/utils"
 )
 
-var defaultUserAgent = fmt.Sprintf("AlibabaCloud (%s; %s) Golang/%s Core/%s", runtime.GOOS, runtime.GOARCH, strings.Trim(runtime.Version(), "go"), "0.01")
+var defaultUserAgent = fmt.Sprintf("AlibabaCloud (%s; %s) Golang/%s Core/%s TeaDSL/1", runtime.GOOS, runtime.GOARCH, strings.Trim(runtime.Version(), "go"), "0.01")
 
 type RuntimeObject struct {
 	Autoretry      *bool   `json:"autoretry" xml:"autoretry"`
