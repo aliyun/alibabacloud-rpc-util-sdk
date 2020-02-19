@@ -208,7 +208,7 @@ public class AlibabaCloudCommons {
     private static func getDefaultUserAgent() -> String {
         if AlibabaCloudCommons._defaultUserAgent.isEmpty {
             var defaultUserAgent: String = ""
-            defaultUserAgent += osName() + " " + version()
+            defaultUserAgent += osName() + " " + version() + " TeaDSL/1"
             return defaultUserAgent
         }
         return AlibabaCloudCommons._defaultUserAgent
