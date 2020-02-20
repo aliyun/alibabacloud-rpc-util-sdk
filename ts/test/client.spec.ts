@@ -159,8 +159,9 @@ describe('base client', function () {
   });
 
   it('getUserAgent should ok', async function () {
-    assert.strictEqual(BaseClient.getUserAgent(''), `Node.js(${process.version}), @alicloud/rpc-util: ${pkg.version}`);
-    assert.strictEqual(BaseClient.getUserAgent('ua'), `Node.js(${process.version}), @alicloud/rpc-util: ${pkg.version} ua`);
+    assert.strictEqual(BaseClient.getUserAgent(''), `AlibabaCloud (${platform()}; ${arch()}) Node.js/${process.version} Core/1.0.1 TeaDSL/1`);
+    assert.strictEqual(BaseClient.getUserAgent('2019'), `AlibabaCloud (${platform()}; ${arch()}) Node.js/${process.version} Core/1.0.1 TeaDSL/1 2019`);
+
   });
 
   it('getDate should ok', async function () {
