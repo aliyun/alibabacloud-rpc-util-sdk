@@ -1,3 +1,6 @@
+### 2020-02-20 Version 0.2.2
+* Improved Function `GetUserAgent()`
+
 ### 2020-02-13 Version 0.2.1
 * Fixed Function `ToForm()`
 * Fixed Function `HasError()`
