@@ -3,8 +3,8 @@ import { Readable } from 'stream';
 import * as $tea from '@alicloud/tea-typescript';
 import * as kitx from "kitx";
 import { Parser } from 'xml2js';
-const pkg = require('../package.json');
-const DEFAULT_USER_AGENT = `Node.js(${process.version}), ${pkg.name}: ${pkg.version}`;
+import { platform, arch } from 'os';
+const DEFAULT_USER_AGENT = `AlibabaCloud (${platform()}; ${arch()}) Node.js/${process.version} Core/1.0.1 TeaDSL/1`;
 
 function parseXML(body: string): any {
   let parser = new Parser({ explicitArray: false });
