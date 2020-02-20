@@ -322,6 +322,7 @@ namespace AlibabaCloud.Commons
             defaultUserAgent = "Alibaba Cloud (" + OSVersion + ") ";
             defaultUserAgent += ClientVersion;
             defaultUserAgent += " Core/" + CoreVersion;
+            defaultUserAgent += " TeaDSL/1";
             return defaultUserAgent;
         }
 
