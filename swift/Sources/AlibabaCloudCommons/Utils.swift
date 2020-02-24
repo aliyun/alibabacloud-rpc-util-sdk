@@ -90,32 +90,6 @@ func jsonEncode(obj: Any) -> String {
     return json.rawString(.utf8, options: .fragmentsAllowed) ?? ""
 }
 
-func osName() -> String {
-    let osNameVersion: String = {
-        let version = ProcessInfo.processInfo.operatingSystemVersion
-        let versionString = "\(version.majorVersion).\(version.minorVersion).\(version.patchVersion)"
-
-        let osName: String = {
-            #if os(iOS)
-            return "iOS"
-            #elseif os(watchOS)
-            return "watchOS"
-            #elseif os(tvOS)
-            return "tvOS"
-            #elseif os(macOS)
-            return "OSX"
-            #elseif os(Linux)
-            return "Linux"
-            #else
-            return "Unknown"
-            #endif
-        }()
-
-        return "\(osName)/\(versionString)"
-    }()
-    return osNameVersion
-}
-
 func version() -> String {
     let package: String = {
         guard
