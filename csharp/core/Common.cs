@@ -309,7 +309,7 @@ namespace AlibabaCloud.Commons
 
         public static string GetBoundary()
         {
-            long num = (long) Math.Floor((new Random()).NextDouble() * 1000000000D);;
+            long num = (long) Math.Floor((new Random()).NextDouble() * 100000000000000D);;
             return num.ToSafeString();
         }
 
