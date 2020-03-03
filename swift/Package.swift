@@ -12,7 +12,7 @@ let package = Package(
             targets: ["AlibabaCloudCommons"])
     ],
     dependencies: [
-        .package(url: "https://github.com/aliyun/tea-swift.git", from: "0.2.0"),
+        .package(url: "https://github.com/aliyun/tea-swift.git", from: "0.3.0"),
         .package(url: "https://github.com/AxiosCros/SwiftyXMLParser.git", from: "5.2.0-beta"),
         .package(url: "https://github.com/SwiftyJSON/SwiftyJSON.git", from: "5.0.0")
     ],
