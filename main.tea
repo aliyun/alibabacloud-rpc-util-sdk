@@ -1,39 +1,8 @@
-module Common {
-  // interface mode
-  model RuntimeObject {
-    autoretry: boolean(description='whether to try again', name='autoretry'),
-    ignoreSSL: boolean(description='ignore SSL validation', name='ignoreSSL'),
-    maxAttempts: number(description='maximum number of retries', name='max_attempts'),
-    backoffPolicy: string(description='backoff policy', name='backoff_policy'),
-    backoffPeriod: number(description='backoff period', name='backoff_period'),
-    readTimeout: number(description='read timeout', name='readTimeout'),
-    connectTimeout: number(description='connect timeout', name='connectTimeout'),
-    httpProxy: string(description='http proxy url', name='httpProxy'),
-    httpsProxy: string(description='https Proxy url', name='httpsProxy'),
-    noProxy: string(description='agent blacklist', name='noProxy'),
-    maxIdleConns: number(description='maximum number of connections', name='maxIdleConns'),
-  }
-  
-  static async function readAsString(body: readable): string;
-  static function getEndpoint(endpoint: string, serverUse: boolean, endpointType: string): string;
-  static function getHost(productId: string, regionId: string, endpoint: string): string;
-  static function convert(body: $Model, content: $Model): void;
-  static function getNonce(): string;
-  static function getSignature(request: $Request, secret: string): string;
-  static async function json(response: $Response): object;
-  static function hasError(obj: object): boolean;
-  static function getTimestamp(): string;
-  static function query(filter: object): map[string]string;
-  static function default(real: string, default: string): string;
-  static function defaultNumber(real: number, default: number): number;
-  static function getUserAgent(userAgent: string): string;
-  static function getDate(): string;
-  static function parseXml(val: string, response: class): object;
-  static function toForm(val: object, content: readable, boundary: string): readable;
-  static function getErrMessage(msg: string): object;
-  static function isFail(response: $Response): boolean;
-  static function getBoundary(): string;
-  static function empty(val: string): boolean;
-  static function equal(val1: string, val2: string): boolean;
-  static function getOpenPlatFormEndpoint(endpoint: string, regionId: string): string;
-}
+static function getEndpoint(endpoint: string, serverUse: boolean, endpointType: string): string;
+static function getHost(productId: string, regionId: string, endpoint: string): string;
+static function getSignature(request: $Request, secret: string): string;
+static function hasError(obj: object): boolean;
+static function getTimestamp(): string;
+static function convert(body: $Model, content: $Model): void;
+static function query(filter: object): map[string]string;
+static function getOpenPlatFormEndpoint(endpoint: string, regionId: string): string;
