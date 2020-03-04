@@ -1,11 +1,11 @@
 {
 	"scope": "alibabacloud",
-	"name": "Common",
-	"version": "0.0.9",
+	"name": "RPCUtil",
+	"version": "0.1.2",
 	"main": "./main.tea",
 	"releases": {
 		"go": "github.com/aliyun/alibabacloud-rpc-util-sdk/golang/service:v1.1.1",
-		"java": "com.aliyun:common:0.0.5",
+		"java": "com.aliyun:common:0.0.6",
 		"csharp": "AlibabaCloud.SDK.Common:0.2.2",
 		"ts": "@alicloud/rpc-util:0.0.2"
 	},

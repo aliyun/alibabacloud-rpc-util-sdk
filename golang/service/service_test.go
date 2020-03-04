@@ -82,7 +82,7 @@ func Test_GetUserAgent(t *testing.T) {
 	utils.AssertContains(t, ua, "Core/0.01")
 
 	ua = GetUserAgent("ua")
-	utils.AssertContains(t, ua, "Core/0.01 ua")
+	utils.AssertContains(t, ua, "Core/0.01 TeaDSL/1 ua")
 }
 
 func Test_GetSignature(t *testing.T) {
@@ -112,6 +112,18 @@ func Test_HasError(t *testing.T) {
 	}
 	iserror = HasError(body)
 	utils.AssertEqual(t, true, iserror)
+
+	body = map[string]interface{}{
+		"Code": 0,
+	}
+	iserror = HasError(body)
+	utils.AssertEqual(t, false, iserror)
+
+	body = map[string]interface{}{
+		"Code": 0.00,
+	}
+	iserror = HasError(body)
+	utils.AssertEqual(t, false, iserror)
 
 	body = make(map[string]interface{})
 	iserror = HasError(body)

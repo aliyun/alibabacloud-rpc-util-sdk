@@ -132,7 +132,8 @@ func HasError(body map[string]interface{}) bool {
 		return true
 	}
 	if obj := body["Code"]; obj != nil {
-		if statusCode := body["Code"].(string); statusCode != "" && statusCode != "0" {
+		code := fmt.Sprintf("%v", body["Code"])
+		if code != "" && code != "0" {
 			return true
 		}
 	}
