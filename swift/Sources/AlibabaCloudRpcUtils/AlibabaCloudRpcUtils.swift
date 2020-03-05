@@ -1,13 +1,13 @@
 import Foundation
 import Tea
-import SwiftyXMLParser
+import SWXMLHash
 
 public enum AliababaCloudCommonsException: Error {
     case Error(Any?)
     case ParseXMLError(String?)
 }
 
-public class AlibabaCloudCommons {
+public class AlibabaCloudRpcUtils {
     public static var _defaultUserAgent: String = ""
     public static var packageVersion: String = "0.1.0"
     public static var supportedRegionId: [String] = ["ap-southeast-1", "ap-northeast-1", "eu-central-1", "cn-hongkong", "ap-south-1"]
@@ -104,21 +104,15 @@ public class AlibabaCloudCommons {
     }
 
     public static func getUserAgent(_ userAgent: String) -> String {
-        AlibabaCloudCommons.getDefaultUserAgent() + " " + userAgent
+        AlibabaCloudRpcUtils.getDefaultUserAgent() + " " + userAgent
     }
 
     public static func getDate() -> String {
         Date().toString()
     }
 
-    public static func parseXml(_ content: String) throws -> XML.Accessor {
-        do {
-            let xml = try XML.parse(content)
-            return xml
-        } catch {
-            print("parse xml error : ", content)
-            throw AliababaCloudCommonsException.ParseXMLError(content)
-        }
+    public static func parseXml(_ content: String) -> XMLIndexer {
+        SWXMLHash.parse(content)
     }
 
     public static func toForm(dict: [String: AnyObject]?, _ content: Data, _ boundary: String) -> Data {
@@ -159,23 +153,18 @@ public class AlibabaCloudCommons {
     }
 
     public static func getErrMessage(_ bodyStr: String) -> [String: String?] {
-        do {
-            let dict = try AlibabaCloudCommons.parseXml(bodyStr)
-            let code: String? = dict["Error"]["Code"].text
-            let msg: String? = dict["Error"]["Message"].text
-            let requestId: String? = dict["Error"]["RequestId"].text
-            let hostId: String? = dict["Error"]["HostId"].text
-            let err: [String: String?] = [
-                "Code": code,
-                "Message": msg,
-                "RequestId": requestId,
-                "HostId": hostId
-            ]
-            return err
-        } catch {
-            print("parse xml error : " + bodyStr)
-            return [String: String]()
-        }
+        let dict: XMLIndexer = AlibabaCloudRpcUtils.parseXml(bodyStr)
+        let code: String? = dict["Error"]["Code"].element?.text
+        let msg: String? = dict["Error"]["Message"].element?.text
+        let requestId: String? = dict["Error"]["RequestId"].element?.text
+        let hostId: String? = dict["Error"]["HostId"].element?.text
+        let err: [String: String?] = [
+            "Code": code,
+            "Message": msg,
+            "RequestId": requestId,
+            "HostId": hostId
+        ]
+        return err
     }
 
     public static func isFail(_ response: TeaResponse) -> Bool {
@@ -197,7 +186,7 @@ public class AlibabaCloudCommons {
 
     public static func getOpenPlatFormEndpoint(_ endpoint: String, _ regionId: String) -> String {
         let region: String = regionId.lowercased()
-        if !region.isEmpty && AlibabaCloudCommons.supportedRegionId.contains(region) {
+        if !region.isEmpty && AlibabaCloudRpcUtils.supportedRegionId.contains(region) {
             var tmp: [String] = endpoint.split(separator: ".").map(String.init)
             tmp[0] = tmp[0] + "." + region
             return tmp.joined(separator: ".")
@@ -206,12 +195,12 @@ public class AlibabaCloudCommons {
     }
 
     private static func getDefaultUserAgent() -> String {
-        if AlibabaCloudCommons._defaultUserAgent.isEmpty {
+        if AlibabaCloudRpcUtils._defaultUserAgent.isEmpty {
             var defaultUserAgent: String = ""
             defaultUserAgent += osName() + " TeaDSL/1 " + version()
             return defaultUserAgent
         }
-        return AlibabaCloudCommons._defaultUserAgent
+        return AlibabaCloudRpcUtils._defaultUserAgent
     }
 
 }

@@ -4,24 +4,23 @@
 import PackageDescription
 
 let package = Package(
-    name: "AlibabaCloudCommons",
+    name: "AlibabaCloudRpcUtils",
     products: [
-        // Products define the executables and libraries produced by a package, and make them visible to other packages.
         .library(
-            name: "AlibabaCloudCommons",
-            targets: ["AlibabaCloudCommons"])
+            name: "AlibabaCloudRpcUtils",
+            targets: ["AlibabaCloudRpcUtils"])
     ],
     dependencies: [
         .package(url: "https://github.com/aliyun/tea-swift.git", from: "0.3.0"),
-        .package(url: "https://github.com/AxiosCros/SwiftyXMLParser.git", from: "5.2.0-beta"),
+        .package(url: "https://github.com/drmohundro/SWXMLHash.git", from: "5.0.0"),
         .package(url: "https://github.com/SwiftyJSON/SwiftyJSON.git", from: "5.0.0")
     ],
     targets: [
         .target(
-            name: "AlibabaCloudCommons",
-            dependencies: ["Tea", "SwiftyXMLParser", "SwiftyJSON"]),
+            name: "AlibabaCloudRpcUtils",
+            dependencies: ["Tea", "SWXMLHash", "SwiftyJSON"]),
         .testTarget(
-            name: "AlibabaCloudCommonsTests",
-            dependencies: ["Tea", "SwiftyJSON"])
+            name: "AlibabaCloudRpcUtilsTests",
+            dependencies: ["AlibabaCloudRpcUtils", "Tea", "SWXMLHash", "SwiftyJSON"])
     ]
 )

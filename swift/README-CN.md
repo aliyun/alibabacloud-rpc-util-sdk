@@ -2,16 +2,44 @@
 
 ![](https://aliyunsdk-pages.alicdn.com/icons/AlibabaCloud.svg)
 
-## Alibaba Cloud RPC Util SDK for Swift
+## Alibaba Cloud ROA Util SDK for Swift
 
 ## 安装
 
 ### CocoaPods
 
-[CocoaPods](https://cocoapods.org) 是 Cocoa 项目管理工具。请访问其官方网站获取关于 CocoaPods 的使用和安装说明。要使用 CocoaPods 将 `AlibabaCloudCommons` 集成到你的 Xcode 项目中，需要在 `Podfile` 中定义以下内容:
+[CocoaPods](https://cocoapods.org) 是 Cocoa 项目管理工具。请访问其官方网站获取关于 CocoaPods 的使用和安装说明。要使用 CocoaPods 将 `AlibabaCloudRpcUtils` 集成到你的 Xcode 项目中，需要在 `Podfile` 中定义以下内容:
 
 ```ruby
-pod 'AlibabaCloudCommons', '~> 0.1.0'
+pod 'AlibabaCloudRpcUtils', '~> 0.1.0'
+```
+
+### Carthage
+
+要使用 [Carthage](https://github.com/Carthage/Carthage) 将 Tea 集成到你的 Xcode 项目中，需要在 `Cartfile` 中定义以下内容:
+
+```ogdl
+github "alibabacloud-sdk-swift/rpc-utils" "0.1.0"
+```
+
+### Swift 包管理工具
+
+要使用 [Swift Package Manager](https://swift.org/package-manager/) 将 Tea 集成到你的 Xcode 项目中，请将 Tea 添加至你的 `Package.swift` 文件的 dependencies 数组内容中:
+
+```swift
+dependencies: [
+    .package(url: "https://github.com/alibabacloud-sdk-swift/rpc-utils.git", from: "0.1.0")
+]
+```
+
+另外，还需要在 `target` 的 `dependencies` 中添加 `"AlibabaCloudRpcUtils"`，如下：
+
+```swift
+.target(
+    name: "<your-project-name>",
+    dependencies: [
+        "AlibabaCloudRpcUtils",
+    ]),
 ```
 
 ## 问题
