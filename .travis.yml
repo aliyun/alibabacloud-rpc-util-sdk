@@ -1,70 +1,37 @@
-language: swift
-os: linux
-osx_image: xcode11.3
-
 jobs:
   include:
-    - language: swift
-      os: osx
-      osx_image: xcode11.3
-      script:
-        - cd swift
-        - swift package generate-xcodeproj --enable-code-coverage
-        - xcodebuild clean build -project AlibabaCloudRpcUtils.xcodeproj -scheme "AlibabaCloudRpcUtils-Package" -sdk "macosx" -destination "platform=OS X,arch=x86_64" -configuration Debug ONLY_ACTIVE_ARCH=NO test
-        - xcodebuild test -project AlibabaCloudRpcUtils.xcodeproj -scheme "AlibabaCloudRpcUtils-Package" -sdk "macosx" -destination "platform=OS X,arch=x86_64" -configuration Debug ONLY_ACTIVE_ARCH=NO test 
-      after_success:
-        - bash <(curl -s https://codecov.io/bash) -J 'AlibabaCloudCommons$'
-
-    - language: go
-      go: 1.12.x
-      script:
-        - cd golang
-        - export GO111MODULE=on
-        - go mod tidy
-        - go test -race -coverprofile=coverage.txt -covermode=atomic ./common/... ./utils...
-      after_success:
-        - bash <(curl -s https://codecov.io/bash) -cF go
-
-    - language: java
-      os: linux
-      jdk: openjdk9
-      script:
-        - cd java
-        - mvn test -B
-      after_success:
-        - bash <(curl -s https://codecov.io/bash) -cF java
-        
-    - language: node_js
-      node_js: 12
-      if: branch = master
-      script:
-        - cd ts
-        - npm install
-        - npm run test-cov
-      after_success:
-        - bash <(curl -s https://codecov.io/bash) -cF node_js
     - language: csharp
       mono: none
       dist: xenial
-      branches:
-        only:
-          - master
-      before_install:
-        - wget https://download.visualstudio.microsoft.com/download/pr/42f39f2f-3f24-4340-8c57-0a3133620c21/0a353696275b00cbddc9f60069867cfc/dotnet-sdk-2.2.110-linux-x64.tar.gz
-        - mkdir -p ~/dotnet/ && tar zxf dotnet-sdk-2.2.110-linux-x64.tar.gz -C ~/dotnet/
-        - sudo ln -sf ~/dotnet/dotnet /usr/bin/dotnet
-        - dotnet --info
-      install:
-        - cd csharp/tests
-        - dotnet tool install --global altcover.visualizer
-        - dotnet restore
-        - dotnet build
-        - cd ../
-      script:
-        - dotnet test tests/ /p:AltCover=true
-      after_success:
-        - bash <(curl -s https://codecov.io/bash) -cF csharp
+      env: TEA_UTIL_ENV="csharp"
+    - language: java
+      jdk: openjdk8
+      env: TEA_UTIL_ENV="java"
+    - language: go
+      go: 1.12.x
+      env: TEA_UTIL_ENV="go"
+    - language: node_js
+      node_js: 12
+      env: TEA_UTIL_ENV="ts"
+    - language: swift
+      os: osx
+      osx_image: xcode11.3
+      env: TEA_UTIL_ENV="swift"
+    - language: php
+      php: '5.6'
+      env: TEA_UTIL_ENV="php"
+    - language: php
+      php: '7.0'
+      env: TEA_UTIL_ENV="php"
+    - language: php
+      php: '7.1'
+      env: TEA_UTIL_ENV="php"
+    - language: php
+      php: '7.2'
+      env: TEA_UTIL_ENV="php"
+    - language: php
+      php: '7.3'
+      env: TEA_UTIL_ENV="php"
 
-notifications:
-  email:
-    on_success: never
+script:
+  - bash ut.sh ${TEA_UTIL_ENV}
