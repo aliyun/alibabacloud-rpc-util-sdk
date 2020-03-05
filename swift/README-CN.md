@@ -2,7 +2,7 @@
 
 ![](https://aliyunsdk-pages.alicdn.com/icons/AlibabaCloud.svg)
 
-## Alibaba Cloud ROA Util SDK for Swift
+## Alibaba Cloud RPC Util SDK for Swift
 
 ## 安装
 

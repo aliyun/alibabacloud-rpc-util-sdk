@@ -171,7 +171,7 @@ final class AlibabaCloudRpcUtilsTests: XCTestCase {
     }
 
     func testGetBoundary() {
-        XCTAssertEqual(32, AlibabaCloudRpcUtils.getBoundary().lengthOfBytes(using: .utf8))
+        XCTAssertEqual(14, AlibabaCloudRpcUtils.getBoundary().lengthOfBytes(using: .utf8))
     }
 
     func testEmpty() {

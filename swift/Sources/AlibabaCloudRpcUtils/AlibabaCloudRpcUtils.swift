@@ -173,7 +173,7 @@ public class AlibabaCloudRpcUtils {
     }
 
     public static func getBoundary() -> String {
-        "1" + String.randomString(len: 31, randomDict: "0123456789")
+        String.randomString(len: 1, randomDict: "123456789") + String.randomString(len: 13, randomDict: "0123456789")
     }
 
     public static func empty(_ str: String) -> Bool {
