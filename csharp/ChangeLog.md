@@ -1,3 +1,6 @@
+### 2020-02-20 Version 0.2.3
+* Fixed Empty Query
+
 ### 2020-02-20 Version 0.2.2
 * Improved Function `GetUserAgent()`
 
