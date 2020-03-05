@@ -2,7 +2,7 @@ English | [简体中文](README-CN.md)
 
 ![](https://aliyunsdk-pages.alicdn.com/icons/AlibabaCloud.svg)
 
-## Alibaba Cloud ROA Util SDK for Swift
+## Alibaba Cloud RPC Util SDK for Swift
 
 ## Installation
 
@@ -19,7 +19,7 @@ pod 'AlibabaCloudRpcUtils', '~> 0.1.0'
 To integrate `AlibabaCloudRpcUtils` into your Xcode project using [Carthage](https://github.com/Carthage/Carthage), specify it in your `Cartfile`:
 
 ```ogdl
-github "alibabacloud-sdk-swift/roa-utils" "0.1.0"
+github "alibabacloud-sdk-swift/rpc-utils" "0.1.0"
 ```
 
 ### Swift Package Manager
@@ -28,7 +28,7 @@ To integrate `AlibabaCloudRpcUtils` into your Xcode project using [Swift Package
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/alibabacloud-sdk-swift/roa-utils.git", from: "0.1.0")
+    .package(url: "https://github.com/alibabacloud-sdk-swift/rpc-utils.git", from: "0.1.0")
 ]
 ```
 
@@ -44,7 +44,7 @@ In addition, you also need to add `"AlibabaCloudRpcUtils"` to the `dependencies`
 
 ## Issues
 
-[Opening an Issue](https://github.com/aliyun/tea-roa-util/issues/new), Issues not conforming to the guidelines may be closed immediately.
+[Opening an Issue](https://github.com/aliyun/alibabacloud-rpc-util-sdk/issues/new), Issues not conforming to the guidelines may be closed immediately.
 
 ## Changelog
 
@@ -52,7 +52,7 @@ Detailed changes for each release are documented in the [release notes](./Change
 
 ## References
 
-* [Latest Release](https://github.com/aliyun/tea-roa-util)
+* [Latest Release](https://github.com/aliyun/alibabacloud-rpc-util-sdk)
 
 ## License
 
