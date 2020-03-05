@@ -93,7 +93,7 @@ func jsonEncode(obj: Any) -> String {
 func version() -> String {
     let package: String = {
         guard
-                let afInfo = Bundle(for: AlibabaCloudCommons.self).infoDictionary,
+                let afInfo = Bundle(for: AlibabaCloudRpcUtils.self).infoDictionary,
                 let build = afInfo["CFBundleShortVersionString"],
                 let name = afInfo["CFBundleName"]
                 else {

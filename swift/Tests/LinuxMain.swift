@@ -1,7 +1,7 @@
 import XCTest
 
-import AlibabaCloudCommonsTests
+import AlibabaCloudRpcUtilsTests
 
 var tests = [XCTestCaseEntry]()
-tests += AlibabaCloudCommonsTests.allTests()
+tests += AlibabaCloudRpcUtilsTests.allTests()
 XCTMain(tests)
