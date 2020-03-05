@@ -363,9 +363,12 @@ namespace AlibabaCloud.Commons
 
             foreach (string key in sortedKeys)
             {
-                canonicalizedQueryString.Append("&")
+                if(!string.IsNullOrEmpty(queries[key]))
+                {
+                    canonicalizedQueryString.Append("&")
                     .Append(PercentEncode(key)).Append("=")
                     .Append(PercentEncode(queries[key]));
+                }
             }
             StringBuilder stringToSign = new StringBuilder();
             stringToSign.Append(request.Method);
@@ -374,6 +377,7 @@ namespace AlibabaCloud.Commons
             stringToSign.Append(SEPARATOR);
             stringToSign.Append(PercentEncode(
                 canonicalizedQueryString.ToString().Substring(1)));
+            System.Diagnostics.Debug.WriteLine("Alibabacloud.Common.GetSignature:stringToSign is " + stringToSign.ToString());
             byte[] signData;
             using(KeyedHashAlgorithm algorithm = CryptoConfig.CreateFromName("HMACSHA1") as KeyedHashAlgorithm)
             {
