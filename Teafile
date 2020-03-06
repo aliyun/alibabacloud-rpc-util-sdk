@@ -13,6 +13,7 @@
 		"namespace": "AlibabaCloud.Commons"
 	},
 	"java": {
-		"package": "com.aliyun.common"
+		"package": "com.aliyun.common",
+		"className": "Common"
 	}
 }
