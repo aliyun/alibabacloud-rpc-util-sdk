@@ -119,11 +119,11 @@ describe('base client', function () {
   });
 
   it('hasError should ok', async function () {
-    assert.strictEqual(BaseClient.hasError({ Code: 200 }), false)
-    assert.strictEqual(BaseClient.hasError({}), true)
+    assert.strictEqual(BaseClient.hasError({ Code: 200 }), true)
+    assert.strictEqual(BaseClient.hasError({}), false)
     assert.strictEqual(BaseClient.hasError(undefined), true)
-    assert.strictEqual(BaseClient.hasError({ Code: undefined }), true)
-    assert.strictEqual(BaseClient.hasError({ Code: null }), true)
+    assert.strictEqual(BaseClient.hasError({ Code: undefined }), false)
+    assert.strictEqual(BaseClient.hasError({ Code: null }), false)
   });
 
   it('getTimestamp should ok', async function () {

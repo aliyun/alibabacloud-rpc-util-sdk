@@ -14,7 +14,7 @@ target/
 .history/
 coverage.html
 coverage.out
-
+**/dist
 # Swift Package Manager
 .build/
 Packages/
