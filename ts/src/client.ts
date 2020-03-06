@@ -287,7 +287,7 @@ export default class Client {
     if (!obj) {
       return true;
     }
-    if (obj.Code === undefined || obj.Code === null) {
+    if (obj.Code && obj.Code !== '0') {
       return true
     }
     return false;
