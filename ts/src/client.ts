@@ -251,8 +251,12 @@ export default class Client {
   }
 
   static convert(input: $tea.Model, output: $tea.Model): void {
+    if (!output) {
+      return;
+    }
     let inputModel = Object.assign({}, input);
-    for (let key in output) {
+    let constructor = <any>output.constructor;
+    for (let key of Object.keys(constructor.names())) {
       if (inputModel[key]) {
         output[key] = inputModel[key];
       }

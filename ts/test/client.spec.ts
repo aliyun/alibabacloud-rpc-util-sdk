@@ -81,12 +81,51 @@ describe('base client', function () {
   });
 
   it('convert should ok', async function () {
-    let inputModel: $tea.Model = new $tea.Model;
-    inputModel.test = 'test';
-    let outputModel: $tea.Model = new $tea.Model;
-    outputModel.test = 'out';
+    class Grant extends $tea.Model {
+      grant: string;
+      static names(): { [key: string]: string } {
+        return {
+          grant: 'Grant',
+        };
+      }
+
+      static types(): { [key: string]: any } {
+        return {
+          grant: 'string',
+        };
+      }
+
+      constructor(map: { [key: string]: any }) {
+        super(map);
+      }
+    }
+
+    class GrantBak extends $tea.Model {
+      grant: string;
+      static names(): { [key: string]: string } {
+        return {
+          grant: 'Grant',
+        };
+      }
+
+      static types(): { [key: string]: any } {
+        return {
+          grant: 'string',
+        };
+      }
+
+      constructor(map: { [key: string]: any }) {
+        super(map);
+      }
+    }
+    let inputModel: $tea.Model = new Grant({
+      grant: 'test',
+    });
+    let outputModel: $tea.Model = new GrantBak({
+      grant: 'out',
+    });
     BaseClient.convert(inputModel, outputModel);
-    assert.strictEqual(outputModel.test, 'test')
+    assert.strictEqual(outputModel.grant, 'test')
   });
 
   it('getNonce should ok', async function () {
