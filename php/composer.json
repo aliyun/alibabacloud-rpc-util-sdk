@@ -2,7 +2,7 @@
     "name": "alibabacloud/tea-rpc-utils",
     "description": "Alibaba Cloud RPC Util SDK for PHP",
     "type": "library",
-    "license": "Apache 2.0",
+    "license": "Apache-2.0",
     "authors": [
       {
         "name": "Alibaba Cloud SDK",
@@ -18,12 +18,12 @@
     },
     "autoload": {
       "psr-4": {
-        "AlibabaCloud\\Tea\\": "src"
+        "AlibabaCloud\\Tea\\RpcUtils\\": "src"
       }
     },
     "autoload-dev": {
       "psr-4": {
-        "AlibabaCloud\\Tea\\Tests\\": "tests"
+        "AlibabaCloud\\Tea\\RpcUtils\\Tests\\": "tests"
       }
     },
     "scripts": {
