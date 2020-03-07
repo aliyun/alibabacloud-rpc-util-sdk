@@ -1,9 +1,9 @@
 <?php
 
-namespace AlibabaCloud\Tea\Tests;
+namespace AlibabaCloud\Tea\Tests\RpcUtils;
 
 use AlibabaCloud\Tea\Model;
-use AlibabaCloud\Tea\RpcUtils;
+use AlibabaCloud\Tea\RpcUtils\RpcUtils;
 use PHPUnit\Framework\TestCase;
 
 class RpcUtilsTest extends TestCase

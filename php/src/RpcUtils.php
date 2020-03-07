@@ -1,6 +1,6 @@
 <?php
 
-namespace AlibabaCloud\Tea;
+namespace AlibabaCloud\Tea\RpcUtils;
 
 use Adbar\Dot;
 
