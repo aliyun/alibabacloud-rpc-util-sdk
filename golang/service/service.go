@@ -1,28 +1,20 @@
 package service
 
 import (
-	"bytes"
 	"crypto/hmac"
 	"crypto/sha1"
 	"encoding/base64"
 	"encoding/json"
-	"encoding/xml"
 	"fmt"
 	"io"
-	"io/ioutil"
-	"net/http"
 	"net/url"
 	"reflect"
-	"runtime"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/alibabacloud-go/tea/tea"
-	"github.com/aliyun/alibabacloud-rpc-util-sdk/golang/utils"
 )
-
-var defaultUserAgent = fmt.Sprintf("AlibabaCloud (%s; %s) Golang/%s Core/%s TeaDSL/1", runtime.GOOS, runtime.GOARCH, strings.Trim(runtime.Version(), "go"), "0.01")
 
 type RuntimeObject struct {
 	Autoretry      *bool   `json:"autoretry" xml:"autoretry"`
@@ -46,14 +38,6 @@ type ServiceError struct {
 	Message   string `json:"Message" xml:"Message"`
 	RequestId string `json:"RequestId" xml:"RequestId"`
 	HostId    string `json:"HostId" xml:"HostId"`
-}
-
-func ReadAsString(body io.Reader) (string, error) {
-	byt, err := ioutil.ReadAll(body)
-	if err != nil {
-		return "", err
-	}
-	return string(byt), nil
 }
 
 func GetEndpoint(endpoint string, server bool, endpointType string) string {
@@ -85,46 +69,15 @@ func Convert(input, output interface{}) {
 	json.Unmarshal(byt, output)
 }
 
-func Default(reaStr, defaultStr string) string {
-	if reaStr == "" {
-		return defaultStr
-	}
-	return reaStr
-}
-
-func DefaultNumber(reaNum, defaultNum int) int {
-	if reaNum == 0 {
-		return defaultNum
-	}
-	return reaNum
-}
-
 func GetTimestamp() string {
 	gmt := time.FixedZone("GMT", 0)
 	return time.Now().In(gmt).Format("2006-01-02T15:04:05Z")
-}
-
-func GetUserAgent(useragent string) string {
-	if useragent == "" {
-		return defaultUserAgent
-	}
-	return defaultUserAgent + " " + useragent
 }
 
 func GetSignature(request *tea.Request, secret string) string {
 	stringToSign := buildRpcStringToSign(request)
 	signature := sign(stringToSign, secret, "&")
 	return signature
-}
-
-func Json(response *tea.Response) (result map[string]interface{}, err error) {
-	body, err := response.ReadBody()
-	if err != nil {
-		return
-	}
-
-	err = json.Unmarshal(body, &result)
-	return
 }
 
 func HasError(body map[string]interface{}) bool {
@@ -154,109 +107,8 @@ func Query(filter map[string]interface{}) map[string]string {
 	return result
 }
 
-func GetNonce() string {
-	return utils.GetUUID()
-}
-
-func IsFail(response *tea.Response) bool {
-	return response.StatusCode < 200 || response.StatusCode >= 300
-}
-
-func ParseXml(val string, result interface{}) map[string]interface{} {
-	resp := make(map[string]interface{})
-
-	start := getStartElement([]byte(val))
-	out, err := XmlUnmarshal([]byte(val), result)
-	if err != nil {
-		return resp
-	}
-	resp[start] = out
-	return resp
-}
-
-func Empty(val string) bool {
-	return val == ""
-}
-
-func Equal(val1, val2 string) bool {
-	return val1 == val2
-}
-
-func GetErrMessage(bodyStr string) map[string]interface{} {
-	resp := make(map[string]interface{})
-	errMsg := &ServiceError{}
-	err := xml.Unmarshal([]byte(bodyStr), errMsg)
-	if err != nil {
-		return resp
-	}
-	resp["Code"] = errMsg.Code
-	resp["Message"] = errMsg.Message
-	resp["RequestId"] = errMsg.RequestId
-	resp["HostId"] = errMsg.HostId
-	return resp
-}
-
-func ToForm(body map[string]interface{}, content io.Reader, boundary string) io.Reader {
-	out := bytes.NewBuffer(nil)
-	if obj := body["UserMeta"]; obj != nil {
-		meta := obj.(map[string]string)
-		delete(body, "UserMeta")
-		for key, value := range meta {
-			body["x-oss-meta-"+key] = value
-		}
-	}
-	line := "--" + boundary + "\r\n"
-	out.Write([]byte(line))
-	for key, value := range body {
-		if val, ok := value.(string); ok {
-			if val != "" {
-				out.Write([]byte("Content-Disposition: form-data; name=\"" + key + "\"" + "\r\n\r\n"))
-				out.Write([]byte(val + "\r\n"))
-				out.Write([]byte(line))
-			}
-		}
-	}
-	if obj, ok := body["file"]; ok {
-		var buffer [512]byte
-		file := make(map[string]interface{})
-		byt, _ := json.Marshal(obj)
-		json.Unmarshal(byt, &file)
-		if file["filename"] != nil {
-			out.Write([]byte("Content-Disposition: form-data; name=\"file\"" + "; " + "filename=\"" + file["filename"].(string) + "\"" + "\r\n"))
-		} else {
-			out.Write([]byte("Content-Disposition: form-data; name=\"file\"" + "; " + "filename=\"\"" + "\r\n"))
-		}
-
-		if file["content-type"] != nil {
-			out.Write([]byte("Content-Type: " + file["content-type"].(string) + "\r\n\r\n"))
-		} else {
-			out.Write([]byte("Content-Type: \r\n\r\n"))
-		}
-		for {
-			n, err := content.Read(buffer[0:])
-			out.Write(buffer[0:n])
-			if err != nil && err == io.EOF {
-				break
-			} else if err != nil {
-				return nil
-			}
-		}
-		out.Write([]byte("\r\n\r\n"))
-	}
-	out.Write([]byte("--" + boundary + "--\r\n"))
-	return out
-}
-
-func GetDate() string {
-	return time.Now().UTC().Format(http.TimeFormat)
-}
-
 func GetHost(product string, regionid string, endpoint string) string {
 	return endpoint
-}
-
-func GetBoundary() string {
-	return utils.RandStringBytes(14)
 }
 
 func flatRepeatedList(dataValue reflect.Value, result map[string]string, prefix string) {
@@ -331,7 +183,7 @@ func buildRpcStringToSign(request *tea.Request) (stringToSign string) {
 		signParams[key] = value
 	}
 
-	stringToSign = utils.GetUrlFormedMap(signParams)
+	stringToSign = getUrlFormedMap(signParams)
 	stringToSign = strings.Replace(stringToSign, "+", "%20", -1)
 	stringToSign = strings.Replace(stringToSign, "*", "%2A", -1)
 	stringToSign = strings.Replace(stringToSign, "%7E", "~", -1)
@@ -340,39 +192,13 @@ func buildRpcStringToSign(request *tea.Request) (stringToSign string) {
 	return
 }
 
-func getStartElement(body []byte) string {
-	d := xml.NewDecoder(bytes.NewReader(body))
-	for {
-		tok, err := d.Token()
-		if err != nil {
-			return ""
-		}
-		if t, ok := tok.(xml.StartElement); ok {
-			return t.Name.Local
-		}
+func getUrlFormedMap(source map[string]string) (urlEncoded string) {
+	urlEncoder := url.Values{}
+	for key, value := range source {
+		urlEncoder.Add(key, value)
 	}
-}
-
-func XmlUnmarshal(body []byte, result interface{}) (interface{}, error) {
-	start := getStartElement(body)
-	dataValue := reflect.ValueOf(result).Elem()
-	dataType := dataValue.Type()
-	for i := 0; i < dataType.NumField(); i++ {
-		field := dataType.Field(i)
-		name, containsNameTag := field.Tag.Lookup("xml")
-		if containsNameTag {
-			if name == start {
-				realType := dataValue.Field(i).Type()
-				realValue := reflect.New(realType).Interface()
-				err := xml.Unmarshal(body, realValue)
-				if err != nil {
-					return nil, err
-				}
-				return realValue, nil
-			}
-		}
-	}
-	return nil, nil
+	urlEncoded = urlEncoder.Encode()
+	return
 }
 
 func GetOpenPlatFormEndpoint(endpoint, regionId string) string {
