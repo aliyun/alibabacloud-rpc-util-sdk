@@ -2,6 +2,8 @@
 
 namespace AlibabaCloud\Tea\RpcUtils;
 
+use AlibabaCloud\Tea\Model;
+use AlibabaCloud\Tea\Request;
 use Adbar\Dot;
 
 class RpcUtils
