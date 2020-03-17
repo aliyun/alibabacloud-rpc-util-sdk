@@ -12,6 +12,10 @@
 	"csharp": {
 		"namespace": "AlibabaCloud.Commons"
 	},
+	"php": {
+		"namespace": "AlibabaCloud.Tea.RpcUtils",
+		"className": "RpcUtils"
+	},
 	"java": {
 		"package": "com.aliyun.common",
 		"className": "Common"
