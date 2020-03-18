@@ -1,6 +1,6 @@
 {
     "name": "alibabacloud/tea-rpc-utils",
-    "description": "Alibaba Cloud RPC Util SDK for PHP",
+    "description": "Alibaba Cloud RPC Utils SDK for PHP",
     "type": "library",
     "license": "Apache-2.0",
     "authors": [
