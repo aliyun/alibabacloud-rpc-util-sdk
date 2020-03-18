@@ -2,34 +2,36 @@
 
 namespace AlibabaCloud\Tea\RpcUtils;
 
+use Adbar\Dot;
 use AlibabaCloud\Tea\Model;
 use AlibabaCloud\Tea\Request;
-use Adbar\Dot;
 
 class RpcUtils
 {
-    public static $supportedRegionId = ["ap-southeast-1", "ap-northeast-1", "eu-central-1", "cn-hongkong", "ap-south-1"];
+    public static $supportedRegionId = ['ap-southeast-1', 'ap-northeast-1', 'eu-central-1', 'cn-hongkong', 'ap-south-1'];
 
-    public static function getEndpoint($endpoint, $useAccelerate, $endpointType = "public")
+    public static function getEndpoint($endpoint, $useAccelerate, $endpointType = 'public')
     {
-        if ($endpointType == 'internal') {
-            $tmp      = explode(".", $endpoint);
-            $tmp[0]   .= "-internal";
-            $endpoint = implode(".", $tmp);
+        if ('internal' == $endpointType) {
+            $tmp      = explode('.', $endpoint);
+            $tmp[0] .= '-internal';
+            $endpoint = implode('.', $tmp);
         }
-        if ($useAccelerate && $endpointType == "accelerate") {
-            return "oss-accelerate.aliyuncs.com";
+        if ($useAccelerate && 'accelerate' == $endpointType) {
+            return 'oss-accelerate.aliyuncs.com';
         }
+
         return $endpoint;
     }
 
     public static function getHost($serviceCode, $regionId, $endpoint)
     {
         if (null === $endpoint || empty($endpoint)) {
-            return strtolower($serviceCode) . "." .
-                strtolower($regionId) . "." .
-                "aliyuncs.com";
+            return strtolower($serviceCode) . '.' .
+                strtolower($regionId) . '.' .
+                'aliyuncs.com';
         }
+
         return $endpoint;
     }
 
@@ -42,6 +44,7 @@ class RpcUtils
     public static function getSignature($request, $secret)
     {
         $strToSign = self::getStrToSign($request->method, $request->query);
+
         return base64_encode(hash_hmac('sha1', $strToSign, $secret, true));
     }
 
@@ -50,10 +53,11 @@ class RpcUtils
         if (null === $dict) {
             return true;
         }
-        if (!isset($dict["Code"])) {
+        if (!isset($dict['Code'])) {
             return false;
         }
-        return $dict["Code"] != "Success";
+
+        return 'Success' != $dict['Code'];
     }
 
     public static function getTimestamp()
@@ -72,8 +76,8 @@ class RpcUtils
         $class = new \ReflectionClass($input);
         foreach ($class->getProperties(\ReflectionProperty::IS_PUBLIC) as $property) {
             $name = $property->getName();
-            if (!$property->isStatic() && isset($output->$name)) {
-                $output->$name = $property->getValue($input);
+            if (!$property->isStatic() && isset($output->{$name})) {
+                $output->{$name} = $property->getValue($input);
             }
         }
     }
@@ -81,17 +85,20 @@ class RpcUtils
     public static function query($dict)
     {
         $dot = new Dot($dict);
+
         return $dot->flatten();
     }
 
     public static function getOpenPlatFormEndpoint($endpoint, $regionId)
     {
         $regionId = strtolower($regionId);
-        if (!empty($regionId) && in_array($regionId, self::$supportedRegionId)) {
-            $tmp    = explode(".", $endpoint);
-            $tmp[0] .= "." . strtolower($regionId);
-            return implode(".", $tmp);
+        if (!empty($regionId) && \in_array($regionId, self::$supportedRegionId)) {
+            $tmp    = explode('.', $endpoint);
+            $tmp[0] .= '.' . strtolower($regionId);
+
+            return implode('.', $tmp);
         }
+
         return $endpoint;
     }
 
@@ -102,13 +109,13 @@ class RpcUtils
         $params = [];
         foreach ($query as $k => $v) {
             //对参数名称和参数值进行 URL 编码
-            $k = \rawurlencode($k);
-            $v = \rawurlencode($v);
+            $k = rawurlencode($k);
+            $v = rawurlencode($v);
             //对编码后的参数名称和值使用英文等号（=）进行连接
-            \array_push($params, $k . '=' . $v);
+            array_push($params, $k . '=' . $v);
         }
         $str = implode('&', $params);
 
-        return $method . '&' . \rawurlencode('/') . '&' . \rawurlencode($str);
+        return $method . '&' . rawurlencode('/') . '&' . rawurlencode($str);
     }
 }
