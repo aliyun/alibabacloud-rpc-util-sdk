@@ -43,9 +43,17 @@ class RpcUtils
      */
     public static function getSignature($request, $secret)
     {
+        $secret .= '&';
         $strToSign = self::getStrToSign($request->method, $request->query);
+        \define('signature', $strToSign);
+        if ('HMAC-SHA1' === $request->query['SignatureMethod']) {
+            return base64_encode(hash_hmac('sha1', $strToSign, $secret, true));
+        }
+        if ('HMAC-SHA256' === $request->query['SignatureMethod']) {
+            return base64_encode(hash_hmac('sha256', $strToSign, $secret, true));
+        }
 
-        return base64_encode(hash_hmac('sha1', $strToSign, $secret, true));
+        throw new \RuntimeException('Invalid Signature Method : ' . $request->query['SignatureMethod']);
     }
 
     public static function hasError($dict)
@@ -62,7 +70,7 @@ class RpcUtils
 
     public static function getTimestamp()
     {
-        return time();
+        return gmdate('Y-m-d\\TH:i:s\\Z');
     }
 
     /**
@@ -108,11 +116,13 @@ class RpcUtils
 
         $params = [];
         foreach ($query as $k => $v) {
-            //对参数名称和参数值进行 URL 编码
-            $k = rawurlencode($k);
-            $v = rawurlencode($v);
-            //对编码后的参数名称和值使用英文等号（=）进行连接
-            array_push($params, $k . '=' . $v);
+            if (!empty($v)) {
+                //对参数名称和参数值进行 URL 编码
+                $k = rawurlencode($k);
+                $v = rawurlencode($v);
+                //对编码后的参数名称和值使用英文等号（=）进行连接
+                array_push($params, $k . '=' . $v);
+            }
         }
         $str = implode('&', $params);
 
