@@ -56,11 +56,8 @@ class RpcUtilsTest extends TestCase
 
     public function testGetTimestamp()
     {
-        $now = RpcUtils::getTimestamp();
-        sleep(1);
-        $end = RpcUtils::getTimestamp();
-
-        $this->assertTrue($end - $now >= 0);
+        $date = RpcUtils::getTimestamp();
+        $this->assertEquals(20, \strlen($date));
     }
 
     public function testConvert()
