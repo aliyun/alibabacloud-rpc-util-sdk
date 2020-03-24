@@ -45,15 +45,15 @@ class RpcUtils
     {
         $secret .= '&';
         $strToSign = self::getStrToSign($request->method, $request->query);
-        \define('signature', $strToSign);
-        if ('HMAC-SHA1' === $request->query['SignatureMethod']) {
-            return base64_encode(hash_hmac('sha1', $strToSign, $secret, true));
+        $signMethod = isset($request->query['SignatureMethod']) ? $request->query['SignatureMethod'] : "HMAC-SHA1";
+        switch($signMethod){
+            case 'HMAC-SHA1':
+                return base64_encode(hash_hmac('sha1', $strToSign, $secret, true));
+            case 'HMAC-SHA256':
+                return base64_encode(hash_hmac('sha256', $strToSign, $secret, true));
+            default:
+                return base64_encode(hash_hmac('sha1', $strToSign, $secret, true));
         }
-        if ('HMAC-SHA256' === $request->query['SignatureMethod']) {
-            return base64_encode(hash_hmac('sha256', $strToSign, $secret, true));
-        }
-
-        throw new \RuntimeException('Invalid Signature Method : ' . $request->query['SignatureMethod']);
     }
 
     public static function hasError($dict)
