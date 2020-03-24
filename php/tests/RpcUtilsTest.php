@@ -3,6 +3,7 @@
 namespace AlibabaCloud\Tea\Tests\RpcUtils;
 
 use AlibabaCloud\Tea\Model;
+use AlibabaCloud\Tea\Request;
 use AlibabaCloud\Tea\RpcUtils\RpcUtils;
 use PHPUnit\Framework\TestCase;
 
@@ -40,6 +41,12 @@ class RpcUtilsTest extends TestCase
 
     public function testGetSignature()
     {
+        $request        = new Request();
+        $request->query = [
+            'query'=> 'test',
+            'body' => 'test',
+        ];
+        $this->assertEquals('XlUyV4sXjOuX5FnjUz9IF9tm5rU=', RpcUtils::getSignature($request, 'secret'));
     }
 
     public function testHasError()
