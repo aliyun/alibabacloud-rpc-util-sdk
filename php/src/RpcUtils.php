@@ -5,6 +5,7 @@ namespace AlibabaCloud\Tea\RpcUtils;
 use Adbar\Dot;
 use AlibabaCloud\Tea\Model;
 use AlibabaCloud\Tea\Request;
+use Psr\Http\Message\StreamInterface;
 
 class RpcUtils
 {
@@ -45,8 +46,9 @@ class RpcUtils
     {
         $secret .= '&';
         $strToSign = self::getStrToSign($request->method, $request->query);
-        $signMethod = isset($request->query['SignatureMethod']) ? $request->query['SignatureMethod'] : "HMAC-SHA1";
-        switch($signMethod){
+
+        $signMethod = isset($request->query['SignatureMethod']) ? $request->query['SignatureMethod'] : 'HMAC-SHA1';
+        switch ($signMethod) {
             case 'HMAC-SHA1':
                 return base64_encode(hash_hmac('sha1', $strToSign, $secret, true));
             case 'HMAC-SHA256':
@@ -84,8 +86,12 @@ class RpcUtils
         $class = new \ReflectionClass($input);
         foreach ($class->getProperties(\ReflectionProperty::IS_PUBLIC) as $property) {
             $name = $property->getName();
-            if (!$property->isStatic() && isset($output->{$name})) {
-                $output->{$name} = $property->getValue($input);
+            if (!$property->isStatic()) {
+                $value = $property->getValue($input);
+                if ($value instanceof StreamInterface) {
+                    continue;
+                }
+                $output->{$name} = $value;
             }
         }
     }
