@@ -275,6 +275,14 @@ export default class Client {
     const key = secret + '&';
     return <string>kitx.sha1(stringToSign, key, 'base64');
   }
+  
+  static getSignatureV1(query: { [key: string]: string }, method: string, secret: string): string {
+    var normalized = normalize(query);
+    var canonicalized = canonicalize(normalized);
+    var stringToSign = `${method}&${encode('/')}&${encode(canonicalized)}`;
+    const key = secret + '&';
+    return <string>kitx.sha1(stringToSign, key, 'base64');
+  }
 
   static async json(body: $tea.Response): Promise<{ [key: string]: any }> {
     let bytes = await body.readBytes();
