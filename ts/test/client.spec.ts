@@ -146,6 +146,14 @@ describe('base client', function () {
     assert.strictEqual(sign, 'YIXsGwFhrzkXBid55ND2rbs/EYk=');
   });
 
+  it('getSignatureV1 should ok', async function () {
+    let query = {
+      test: 'ok'
+    }
+    let sign = BaseClient.getSignatureV1(query,'', 'accessKeySecret');
+    assert.strictEqual(sign, 'jHx/oHoHNrbVfhncHEvPdHXZwHU=');
+  });
+
   it('json should ok', async function () {
     const res = await request('http://127.0.0.1:8848', { method: 'PUT' });
     const teaRes = new $tea.Response(res);
