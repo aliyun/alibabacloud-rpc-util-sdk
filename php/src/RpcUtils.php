@@ -48,14 +48,23 @@ class RpcUtils
         $strToSign = self::getStrToSign($request->method, $request->query);
 
         $signMethod = isset($request->query['SignatureMethod']) ? $request->query['SignatureMethod'] : 'HMAC-SHA1';
-        switch ($signMethod) {
-            case 'HMAC-SHA1':
-                return base64_encode(hash_hmac('sha1', $strToSign, $secret, true));
-            case 'HMAC-SHA256':
-                return base64_encode(hash_hmac('sha256', $strToSign, $secret, true));
-            default:
-                return base64_encode(hash_hmac('sha1', $strToSign, $secret, true));
-        }
+
+        return self::encode($signMethod, $strToSign, $secret);
+    }
+
+    /**
+     * @param array  $signedParams
+     * @param string $method
+     * @param string $secret
+     *
+     * @return string
+     */
+    public static function getSignatureV1($signedParams, $method, $secret)
+    {
+        $secret .= '&';
+        $strToSign = self::getStrToSign($method, $signedParams);
+
+        return self::encode('', $strToSign, $secret);
     }
 
     public static function hasError($dict)
@@ -133,5 +142,15 @@ class RpcUtils
         $str = implode('&', $params);
 
         return $method . '&' . rawurlencode('/') . '&' . rawurlencode($str);
+    }
+
+    private static function encode($signMethod, $strToSign, $secret)
+    {
+        switch ($signMethod) {
+            case 'HMAC-SHA256':
+                return base64_encode(hash_hmac('sha256', $strToSign, $secret, true));
+            default:
+                return base64_encode(hash_hmac('sha1', $strToSign, $secret, true));
+        }
     }
 }
