@@ -206,8 +206,8 @@ public class Common {
         return defaultUserAgent + " " + a;
     }
 
-    public static String getSignature(Map<String, String> signedParams,String method, String secret) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
-        Map<String, String> queries = signedParams;
+    public static String getSignature(TeaRequest request, String secret) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
+        Map<String, String> queries = request.query;
         String[] sortedKeys = queries.keySet().toArray(new String[]{});
         Arrays.sort(sortedKeys);
         StringBuilder canonicalizedQueryString = new StringBuilder();
@@ -218,7 +218,7 @@ public class Common {
                     .append(percentEncode(queries.get(key)));
         }
         StringBuilder stringToSign = new StringBuilder();
-        stringToSign.append(method);
+        stringToSign.append(request.method);
         stringToSign.append(SEPARATOR);
         stringToSign.append(percentEncode("/"));
         stringToSign.append(SEPARATOR);
@@ -309,5 +309,12 @@ public class Common {
         } else {
             return endpoint;
         }
+    }
+
+    public static String getSignatureV1(java.util.Map<String, String> signedParams, String method, String secret) throws Exception {
+        TeaRequest teaRequest = new TeaRequest();
+        teaRequest.query = signedParams;
+        teaRequest.method = method;
+        return Common.getSignature(teaRequest, secret);
     }
 }
