@@ -43,10 +43,18 @@ class RpcUtilsTest extends TestCase
     {
         $request        = new Request();
         $request->query = [
-            'query'=> 'test',
-            'body' => 'test',
+            'query' => 'test',
+            'body'  => 'test',
         ];
         $this->assertEquals('XlUyV4sXjOuX5FnjUz9IF9tm5rU=', RpcUtils::getSignature($request, 'secret'));
+    }
+
+    public function testGetSignatureV1()
+    {
+        $query   = [
+            'test' => 'ok',
+        ];
+        $this->assertEquals('jHx/oHoHNrbVfhncHEvPdHXZwHU=', RpcUtils::getSignatureV1($query, '', 'accessKeySecret'));
     }
 
     public function testHasError()
