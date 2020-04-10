@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/alibabacloud-go/tea/tea"
 	"github.com/alibabacloud-go/tea/utils"
 )
 
@@ -51,12 +52,20 @@ func Test_GetTimestamp(t *testing.T) {
 	utils.AssertNotNil(t, stamp)
 }
 
-func Test_GetSignature(t *testing.T) {
+func Test_GetSignatureV1(t *testing.T) {
 	signed := map[string]string{
 		"test": "ok",
 	}
 
-	sign := GetSignature(signed, "", "accessKeySecret")
+	sign := GetSignatureV1(signed, "", "accessKeySecret")
+	utils.AssertEqual(t, "jHx/oHoHNrbVfhncHEvPdHXZwHU=", sign)
+}
+
+func Test_GetSignature(t *testing.T) {
+	req := tea.NewRequest()
+	req.Query["test"] = "ok"
+
+	sign := GetSignature(req, "accessKeySecret")
 	utils.AssertEqual(t, "jHx/oHoHNrbVfhncHEvPdHXZwHU=", sign)
 }
 

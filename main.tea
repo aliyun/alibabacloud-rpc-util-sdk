@@ -1,6 +1,7 @@
 static function getEndpoint(endpoint: string, serverUse: boolean, endpointType: string): string;
 static function getHost(productId: string, regionId: string, endpoint: string): string;
-static function getSignature(signedParams: map[string]string, method: string, secret: string): string;
+static function getSignature(request: $Request, secret: string): string;
+static function getSignatureV1(signedParams: map[string]string, method: string, secret: string): string;
 static function hasError(obj: object): boolean;
 static function getTimestamp(): string;
 static function convert(body: $Model, content: $Model): void;

@@ -12,6 +12,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/alibabacloud-go/tea/tea"
 )
 
 type RuntimeObject struct {
@@ -72,8 +74,14 @@ func GetTimestamp() string {
 	return time.Now().In(gmt).Format("2006-01-02T15:04:05Z")
 }
 
-func GetSignature(signedParam map[string]string, method string, secret string) string {
-	stringToSign := buildRpcStringToSign(signedParam, method)
+func GetSignatureV1(signedParam map[string]string, method string, secret string) string {
+	stringToSign := buildRpcStringToSignV1(signedParam, method)
+	signature := sign(stringToSign, secret, "&")
+	return signature
+}
+
+func GetSignature(request *tea.Request, secret string) string {
+	stringToSign := buildRpcStringToSign(request)
 	signature := sign(stringToSign, secret, "&")
 	return signature
 }
@@ -175,7 +183,7 @@ func shaHmac1(source, secret string) []byte {
 	return hmac.Sum(nil)
 }
 
-func buildRpcStringToSign(signedParam map[string]string, method string) (stringToSign string) {
+func buildRpcStringToSignV1(signedParam map[string]string, method string) (stringToSign string) {
 	signParams := make(map[string]string)
 	for key, value := range signedParam {
 		signParams[key] = value
@@ -187,6 +195,21 @@ func buildRpcStringToSign(signedParam map[string]string, method string) (stringT
 	stringToSign = strings.Replace(stringToSign, "%7E", "~", -1)
 	stringToSign = url.QueryEscape(stringToSign)
 	stringToSign = method + "&%2F&" + stringToSign
+	return
+}
+
+func buildRpcStringToSign(request *tea.Request) (stringToSign string) {
+	signParams := make(map[string]string)
+	for key, value := range request.Query {
+		signParams[key] = value
+	}
+
+	stringToSign = getUrlFormedMap(signParams)
+	stringToSign = strings.Replace(stringToSign, "+", "%20", -1)
+	stringToSign = strings.Replace(stringToSign, "*", "%2A", -1)
+	stringToSign = strings.Replace(stringToSign, "%7E", "~", -1)
+	stringToSign = url.QueryEscape(stringToSign)
+	stringToSign = request.Method + "&%2F&" + stringToSign
 	return
 }
 
