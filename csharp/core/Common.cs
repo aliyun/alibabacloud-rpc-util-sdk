@@ -10,12 +10,12 @@ using System.Text;
 using System.Text.RegularExpressions;
 
 using AlibabaCloud.Commons.Models;
-using AlibabaCloud.Commons.Utils;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 using Tea;
+using Tea.Utils;
 
 namespace AlibabaCloud.Commons
 {
@@ -24,53 +24,6 @@ namespace AlibabaCloud.Commons
 
         internal static string _defaultUserAgent;
         internal static string SEPARATOR = "&";
-
-        static Common()
-        {
-            _defaultUserAgent = GetDefaultUserAgent();
-        }
-
-        public static string ReadAsString(Stream stream)
-        {
-            if (stream == null)
-            {
-                return string.Empty;
-            }
-            int bufferLength = 1024;
-            using(var ms = new MemoryStream())
-            {
-                var buffer = new byte[bufferLength];
-
-                while (true)
-                {
-                    var length = stream.Read(buffer, 0, bufferLength);
-                    if (length == 0)
-                    {
-                        break;
-                    }
-
-                    ms.Write(buffer, 0, length);
-                }
-
-                ms.Seek(0, SeekOrigin.Begin);
-                var bytes = new byte[ms.Length];
-                ms.Read(bytes, 0, bytes.Length);
-
-                stream.Close();
-                stream.Dispose();
-
-                return Encoding.UTF8.GetString(bytes);
-            }
-        }
-
-        public static int GetContentLength(string str)
-        {
-            if (string.IsNullOrWhiteSpace(str))
-            {
-                return 0;
-            }
-            return str.Length;
-        }
 
         public static string GetEndpoint(string endpoint, bool? useAccelerate, string endpointType)
         {
@@ -115,46 +68,14 @@ namespace AlibabaCloud.Commons
             }
         }
 
-        public static string Default(string reaStr, string defaultStr)
-        {
-            if (string.IsNullOrWhiteSpace(reaStr))
-            {
-                return defaultStr;
-            }
-            return reaStr;
-        }
-
-        public static int? DefaultNumber(int? reaNum, int? defaultNum)
-        {
-            if (reaNum == null || reaNum == 0)
-            {
-                return defaultNum;
-            }
-            return reaNum;
-        }
-
         public static string GetTimestamp()
         {
             return DateTime.UtcNow.ToString("yyyy-MM-dd'T'HH:mm:ss'Z'");
         }
 
-        public static string GetUserAgent(string userAgent)
-        {
-            return _defaultUserAgent + " " + userAgent;
-        }
-
         public static string GetSignature(TeaRequest request, string secret)
         {
             return GetRpcSignedStr(request.Query, request.Method, secret);
-        }
-
-        public static Dictionary<string, object> Json(TeaResponse response)
-        {
-            string bodyStr = TeaCore.GetResponseBody(response);
-            Dictionary<string, object> dic = new Dictionary<string, object>();
-            Dictionary<string, object> dicBody = JsonConvert.DeserializeObject<Dictionary<string, object>>(bodyStr);
-            dic = ObjToDictionary(dicBody);
-            return dic;
         }
 
         public static bool HasError(Dictionary<string, object> body)
@@ -163,7 +84,7 @@ namespace AlibabaCloud.Commons
             {
                 return true;
             }
-            object resultCode = DictUtils.GetDicValue(body, "Code");
+            object resultCode = body.Get("Code");
             if (resultCode == null)
             {
                 return false;
@@ -189,114 +110,6 @@ namespace AlibabaCloud.Commons
             return outDict;
         }
 
-        public static string GetNonce()
-        {
-            return Guid.NewGuid().ToString();
-        }
-
-        public static Dictionary<string, object> ParseXml(string content, Type type)
-        {
-            return XmlUtil.DeserializeXml(content, type);
-        }
-
-        public static bool Empty(string val)
-        {
-            return string.IsNullOrEmpty(val);
-        }
-
-        public static bool Equal(string val1, string val2)
-        {
-            return val1 == val2;
-        }
-
-        public static Dictionary<string, object> GetErrMessage(string bodyStr)
-        {
-            return (Dictionary<string, object>) DictUtils.GetDicValue(XmlUtil.DeserializeXml(bodyStr, typeof(ServiceError)), "Error");
-        }
-
-        public static bool IsFail(TeaResponse response)
-        {
-            return response.StatusCode < 200 || response.StatusCode >= 300;
-        }
-
-        public static Stream ToForm(Dictionary<string, object> dict, Stream sourceFile, string boundary)
-        {
-            if (dict == null)
-            {
-                return sourceFile;
-            }
-            MemoryStream formStream = new MemoryStream();
-
-            StringBuilder stringBuilder = new StringBuilder();
-            object file = DictUtils.GetDicValue(dict, "file");
-            if (dict.ContainsKey("file"))
-            {
-                dict.Remove("file");
-            }
-            if (DictUtils.GetDicValue(dict, "UserMeta") != null)
-            {
-                Dictionary<string, string> userMeta = (Dictionary<string, string>) DictUtils.GetDicValue(dict, "UserMeta");
-                foreach (var keypair in userMeta)
-                {
-                    stringBuilder.Append("--").Append(boundary).Append("\r\n");
-                    stringBuilder.Append("Content-Disposition: form-data; name=\"x-oss-meta-").Append(keypair.Key).Append("\"\r\n\r\n");
-                    stringBuilder.Append(keypair.Value).Append("\r\n");
-                }
-                dict.Remove("UserMeta");
-            }
-            foreach (var keypair in dict)
-            {
-                if (keypair.Value != null)
-                {
-                    stringBuilder.Append("--").Append(boundary).Append("\r\n");
-                    stringBuilder.Append("Content-Disposition: form-data; name=\"").Append(keypair.Key).Append("\"\r\n\r\n");
-                    stringBuilder.Append(keypair.Value).Append("\r\n");
-                }
-            }
-            if (file != null)
-            {
-                Dictionary<string, object> headerFile = (Dictionary<string, object>) file;
-                stringBuilder.Append("--").Append(boundary).Append("\r\n");
-                stringBuilder.Append("Content-Disposition: form-data; name=\"file\"; filename=\"").Append(DictUtils.GetDicValue(headerFile, "filename")).Append("\"\r\n");
-                stringBuilder.Append("Content-Type: ").Append(DictUtils.GetDicValue(headerFile, "content-type")).Append("\r\n\r\n");
-
-                //write startStr in Stream
-                byte[] sbByte = Encoding.UTF8.GetBytes(stringBuilder.ToString());
-                formStream.Write(sbByte, 0, sbByte.Length);
-
-                //write file in Stream
-                byte[] buffer = new byte[4096];
-                int bytesRFile;
-                while ((bytesRFile = sourceFile.Read(buffer, 0, buffer.Length)) != 0)
-                {
-                    formStream.Write(buffer, 0, bytesRFile);
-                }
-                sourceFile.Flush();
-                sourceFile.Close();
-
-                byte[] bytesFileEnd = Encoding.UTF8.GetBytes("\r\n");
-                formStream.Write(bytesFileEnd, 0, bytesFileEnd.Length);
-            }
-            else
-            {
-                //write stringBuilder in Stream
-                byte[] sbByte = Encoding.UTF8.GetBytes(stringBuilder.ToString());
-                formStream.Write(sbByte, 0, sbByte.Length);
-            }
-
-            //write endStr in Stream
-            string endStr = string.Format("--{0}--\r\n", boundary);
-            byte[] endBytes = Encoding.UTF8.GetBytes(endStr);
-            formStream.Write(endBytes, 0, endBytes.Length);
-
-            return formStream;
-        }
-
-        public static string GetDate()
-        {
-            return DateTime.UtcNow.ToUniversalTime().GetDateTimeFormats('r') [0];
-        }
-
         public static string GetHost(string product, string regionid, string endpoint)
         {
             if (endpoint == null)
@@ -307,56 +120,9 @@ namespace AlibabaCloud.Commons
             return endpoint;
         }
 
-        public static string GetBoundary()
-        {
-            long num = (long) Math.Floor((new Random()).NextDouble() * 100000000000000D);;
-            return num.ToSafeString();
-        }
-
         public static string GetSignatureV1(Dictionary<string,string> signedParams, string method, string secret)
         {
             return GetRpcSignedStr(signedParams, method, secret);
-        }
-
-        internal static string GetDefaultUserAgent()
-        {
-            string defaultUserAgent = string.Empty;
-            string OSVersion = Environment.OSVersion.ToString();
-            string ClientVersion = GetRuntimeRegexValue(RuntimeEnvironment.GetRuntimeDirectory());
-            string CoreVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            defaultUserAgent = "Alibaba Cloud (" + OSVersion + ") ";
-            defaultUserAgent += ClientVersion;
-            defaultUserAgent += " Core/" + CoreVersion;
-            defaultUserAgent += " TeaDSL/1";
-            return defaultUserAgent;
-        }
-
-        internal static string GetRuntimeRegexValue(string value)
-        {
-            var rx = new Regex(@"(\.NET).*(\\|\/).*(\d)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-            var matches = rx.Match(value);
-            char[] separator = { '\\', '/' };
-
-            if (matches.Success)
-            {
-                var clientValueArray = matches.Value.Split(separator);
-                return BuildClientVersion(clientValueArray);
-            }
-
-            return "RuntimeNotFound";
-        }
-
-        internal static string BuildClientVersion(string[] value)
-        {
-            var finalValue = "";
-            for (var i = 0; i < value.Length - 1; ++i)
-            {
-                finalValue += value[i].Replace(".", "").ToLower();
-            }
-
-            finalValue += "/" + value[value.Length - 1];
-
-            return finalValue;
         }
 
         internal static string GetRpcSignedStr(Dictionary<string, string> queries, string method, string secret)
@@ -393,27 +159,6 @@ namespace AlibabaCloud.Commons
 
         }
 
-        internal static string BuildUrl(TeaRequest request)
-        {
-            string url = request.Pathname.ToSafeString(string.Empty);
-            Dictionary<string, string> hs = (from dic in request.Query orderby dic.Key ascending select dic).ToDictionary(p => p.Key, p => p.Value);
-
-            if (hs.Count > 0 && !url.Contains("?"))
-            {
-                url += "?";
-            }
-
-            foreach (var keypair in hs)
-            {
-                if (!url.EndsWith("?"))
-                {
-                    url += "&";
-                }
-                url += keypair.Key + "=" + keypair.Value;
-            }
-            return url;
-        }
-
         internal static string PercentEncode(string value)
         {
             if (value == null)
@@ -437,34 +182,6 @@ namespace AlibabaCloud.Commons
 
             return stringBuilder.ToString().Replace("+", "%20")
                 .Replace("*", "%2A").Replace("%7E", "~");
-        }
-
-        internal static Dictionary<string, object> ObjToDictionary(Dictionary<string, object> dicObj)
-        {
-            Dictionary<string, object> dic = new Dictionary<string, object>();
-            foreach (string key in dicObj.Keys)
-            {
-                if (dicObj[key] is JArray)
-                {
-                    List<Dictionary<string, object>> dicObjList = ((JArray) dicObj[key]).ToObject<List<Dictionary<string, object>>>();
-                    List<Dictionary<string, object>> dicList = new List<Dictionary<string, object>>();
-                    foreach (Dictionary<string, object> objItem in dicObjList)
-                    {
-                        dicList.Add(ObjToDictionary(objItem));
-                    }
-                    dic.Add(key, dicList);
-                }
-                else if (dicObj[key] is JObject)
-                {
-                    Dictionary<string, object> dicJObj = ((JObject) dicObj[key]).ToObject<Dictionary<string, object>>();
-                    dic.Add(key, dicJObj);
-                }
-                else
-                {
-                    dic.Add(key, dicObj[key]);
-                }
-            }
-            return dic;
         }
 
         public static string GetOpenPlatFormEndpoint(string endpoint, string regionId)
