@@ -207,27 +207,7 @@ public class Common {
     }
 
     public static String getSignature(TeaRequest request, String secret) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
-        Map<String, String> queries = request.query;
-        String[] sortedKeys = queries.keySet().toArray(new String[]{});
-        Arrays.sort(sortedKeys);
-        StringBuilder canonicalizedQueryString = new StringBuilder();
-
-        for (String key : sortedKeys) {
-            canonicalizedQueryString.append("&")
-                    .append(percentEncode(key)).append("=")
-                    .append(percentEncode(queries.get(key)));
-        }
-        StringBuilder stringToSign = new StringBuilder();
-        stringToSign.append(request.method);
-        stringToSign.append(SEPARATOR);
-        stringToSign.append(percentEncode("/"));
-        stringToSign.append(SEPARATOR);
-        stringToSign.append(percentEncode(
-                canonicalizedQueryString.toString().substring(1)));
-        Mac mac = Mac.getInstance(ALGORITHM_NAME);
-        mac.init(new SecretKeySpec((secret + SEPARATOR).getBytes(URL_ENCODING), ALGORITHM_NAME));
-        byte[] signData = mac.doFinal(stringToSign.toString().getBytes(URL_ENCODING));
-        return DatatypeConverter.printBase64Binary(signData);
+        return getSignature(request.query, request.method, secret);
     }
 
     public static String percentEncode(String value) throws UnsupportedEncodingException {
@@ -312,9 +292,31 @@ public class Common {
     }
 
     public static String getSignatureV1(java.util.Map<String, String> signedParams, String method, String secret) throws Exception {
-        TeaRequest teaRequest = new TeaRequest();
-        teaRequest.query = signedParams;
-        teaRequest.method = method;
-        return Common.getSignature(teaRequest, secret);
+        return getSignature(signedParams, method, secret);
+    }
+
+    private static String getSignature(java.util.Map<String, String> signedParams, String method, String secret) throws
+            UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
+        Map<String, String> queries = signedParams;
+        String[] sortedKeys = queries.keySet().toArray(new String[]{});
+        Arrays.sort(sortedKeys);
+        StringBuilder canonicalizedQueryString = new StringBuilder();
+
+        for (String key : sortedKeys) {
+            canonicalizedQueryString.append("&")
+                    .append(percentEncode(key)).append("=")
+                    .append(percentEncode(queries.get(key)));
+        }
+        StringBuilder stringToSign = new StringBuilder();
+        stringToSign.append(method);
+        stringToSign.append(SEPARATOR);
+        stringToSign.append(percentEncode("/"));
+        stringToSign.append(SEPARATOR);
+        stringToSign.append(percentEncode(
+                canonicalizedQueryString.toString().substring(1)));
+        Mac mac = Mac.getInstance(ALGORITHM_NAME);
+        mac.init(new SecretKeySpec((secret + SEPARATOR).getBytes(URL_ENCODING), ALGORITHM_NAME));
+        byte[] signData = mac.doFinal(stringToSign.toString().getBytes(URL_ENCODING));
+        return DatatypeConverter.printBase64Binary(signData);
     }
 }

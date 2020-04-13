@@ -80,7 +80,7 @@ public class CommonTest {
         map.put("query", "test");
         map.put("body", "test");
         teaRequest.query = map;
-        String result = Common.getSignature(map, "GET", "secret");
+        String result = Common.getSignatureV1(map, "GET", "secret");
         Assert.assertEquals("XlUyV4sXjOuX5FnjUz9IF9tm5rU=", result);
     }
 
