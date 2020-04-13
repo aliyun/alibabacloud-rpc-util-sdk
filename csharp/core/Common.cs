@@ -145,7 +145,7 @@ namespace AlibabaCloud.Commons
 
         public static string GetSignature(TeaRequest request, string secret)
         {
-            return GetRpcSignedStr(request, secret);
+            return GetRpcSignedStr(request.Query, request.Method, secret);
         }
 
         public static Dictionary<string, object> Json(TeaResponse response)
@@ -313,6 +313,11 @@ namespace AlibabaCloud.Commons
             return num.ToSafeString();
         }
 
+        public static string GetSignatureV1(Dictionary<string,string> signedParams, string method, string secret)
+        {
+            return GetRpcSignedStr(signedParams, method, secret);
+        }
+
         internal static string GetDefaultUserAgent()
         {
             string defaultUserAgent = string.Empty;
@@ -354,9 +359,8 @@ namespace AlibabaCloud.Commons
             return finalValue;
         }
 
-        internal static string GetRpcSignedStr(TeaRequest request, string secret)
+        internal static string GetRpcSignedStr(Dictionary<string, string> queries, string method, string secret)
         {
-            Dictionary<string, string> queries = new Dictionary<string, string>(request.Query);
             List<string> sortedKeys = queries.Keys.ToList();
             sortedKeys.Sort();
             StringBuilder canonicalizedQueryString = new StringBuilder();
@@ -371,7 +375,7 @@ namespace AlibabaCloud.Commons
                 }
             }
             StringBuilder stringToSign = new StringBuilder();
-            stringToSign.Append(request.Method);
+            stringToSign.Append(method);
             stringToSign.Append(SEPARATOR);
             stringToSign.Append(PercentEncode("/"));
             stringToSign.Append(SEPARATOR);
