@@ -113,11 +113,24 @@ namespace tests
             TeaRequest request = new TeaRequest(); 
             request.Method = "GET";
             Dictionary<string, string> query = new Dictionary<string, string>
-            { { "query", "test" },
+            { 
+                { "query", "test" },
                 { "body", "test" },
             };
             request.Query = query;
             string result = Common.GetSignature(request, "secret");
+            Assert.Equal("XlUyV4sXjOuX5FnjUz9IF9tm5rU=", result);
+        }
+
+        [Fact]
+        public void Test_GetSignatureV1()
+        {
+            Dictionary<string, string> query = new Dictionary<string, string>
+            { 
+                { "query", "test" },
+                { "body", "test" },
+            };
+            string result = Common.GetSignatureV1(query, "GET", "secret");
             Assert.Equal("XlUyV4sXjOuX5FnjUz9IF9tm5rU=", result);
         }
 
@@ -325,5 +338,7 @@ namespace tests
             result = Common.GetErrMessage(errMessage);
             Assert.Null(result);
         }
+
+        
     }
 }
