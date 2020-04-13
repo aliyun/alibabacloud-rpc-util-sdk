@@ -1,11 +1,11 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net45</TargetFrameworks>
     <RootNamespace>AlibabaCloud.Commons</RootNamespace>
-    <Version>0.2.3</Version>
+    <Version>0.2.4</Version>
     <Authors>Alibaba Cloud</Authors>
     <PackageTags>Alibaba Aliyun Common SDK</PackageTags>
-    <Copyright>©2009-2019 Alibaba Cloud</Copyright>
+    <Copyright>©2009-present Alibaba Cloud</Copyright>
     <PackageProjectUrl>https://github.com/aliyun/</PackageProjectUrl>
     <PackageIconUrl>https://www.alibabacloud.com/favicon.ico</PackageIconUrl>
     <Description>Alibaba Cloud Common SDK for .NET</Description>
@@ -52,3 +52,4 @@
   </ItemGroup>
   
 </Project>
+

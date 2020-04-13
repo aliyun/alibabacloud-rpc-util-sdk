@@ -1,3 +1,6 @@
+### 2020-04-13 Version 0.2.4
+* Supported `GetSignatureV1()`
+
 ### 2020-02-20 Version 0.2.3
 * Fixed Empty Query
 
