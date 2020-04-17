@@ -3,8 +3,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.aliyun</groupId>
-    <artifactId>common</artifactId>
-    <version>0.0.8</version>
+    <artifactId>tea-rpc-util</artifactId>
+    <version>0.0.9</version>
     <packaging>jar</packaging>
 
     <name>common</name>

@@ -5,7 +5,7 @@
 	"main": "./main.tea",
 	"releases": {
 		"go": "github.com/alibabacloud-go/tea-rpc-utils/service:v0.0.1",
-		"java": "com.aliyun:common:0.0.8",
+		"java": "com.aliyun:tea-rpc-util:0.0.9",
 		"csharp": "AlibabaCloud.SDK.Common:0.2.4",
 		"ts": "@alicloud/rpc-util:0.0.2",
 		"php": "alibabacloud/tea-rpc-utils:^0.2.0"
