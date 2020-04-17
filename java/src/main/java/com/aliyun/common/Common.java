@@ -115,7 +115,7 @@ public class Common {
         }
         StringBuilder stringBuilder = new StringBuilder();
         Object file = map.remove("file");
-        if (null != map.get("UserMeta")) {
+        if (!StringUtils.isEmpty(map.get("UserMeta"))) {
             Map<String, String> userMeta = (Map<String, String>) map.remove("UserMeta");
             for (Map.Entry<String, String> meta : userMeta.entrySet()) {
                 stringBuilder.append("--").append(boundary).append("\r\n");
@@ -125,7 +125,7 @@ public class Common {
 
         }
         for (Map.Entry<String, Object> entry : map.entrySet()) {
-            if (entry.getValue() != null) {
+            if (!StringUtils.isEmpty(entry.getValue())) {
                 stringBuilder.append("--").append(boundary).append("\r\n");
                 stringBuilder.append("Content-Disposition: form-data; name=\"").append(entry.getKey()).append("\"\r\n\r\n");
                 stringBuilder.append(entry.getValue()).append("\r\n");
@@ -303,6 +303,9 @@ public class Common {
         StringBuilder canonicalizedQueryString = new StringBuilder();
 
         for (String key : sortedKeys) {
+            if (StringUtils.isEmpty(queries.get(key))) {
+                continue;
+            }
             canonicalizedQueryString.append("&")
                     .append(percentEncode(key)).append("=")
                     .append(percentEncode(queries.get(key)));

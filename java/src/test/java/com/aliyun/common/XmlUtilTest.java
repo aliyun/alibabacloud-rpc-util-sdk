@@ -6,6 +6,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -60,7 +61,10 @@ public class XmlUtilTest {
         owner.displayName = "disName";
         contents.owner = owner;
         contents.key = "key";
-        result.contents = new GetBucketResponseListBucketResultContents[]{contents, contents2};
+        ArrayList list = new ArrayList();
+        list.add(contents);
+        list.add(contents2);
+        result.contents = list;
         body.contents = result;
         Map<String, Object> map = body.toMap();
         String xml = XmlUtil.mapToXml(map);
