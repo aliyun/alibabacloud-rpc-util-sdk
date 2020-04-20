@@ -40,14 +40,14 @@ type ServiceError struct {
 	HostId    string `json:"HostId" xml:"HostId"`
 }
 
-func GetEndpoint(endpoint string, server bool, endpointType string) string {
-	if endpointType == "internal" {
-		strs := strings.Split(endpoint, ".")
+func GetEndpoint(endpoint *string, server *bool, endpointType *string) *string {
+	if tea.StringValue(endpointType) == "internal" {
+		strs := strings.Split(tea.StringValue(endpoint), ".")
 		strs[0] += "-internal"
-		endpoint = strings.Join(strs, ".")
+		endpoint = tea.String(strings.Join(strs, "."))
 	}
-	if server && endpointType == "accelerate" {
-		return "oss-accelerate.aliyuncs.com"
+	if tea.BoolValue(server) && tea.StringValue(endpointType) == "accelerate" {
+		return tea.String("oss-accelerate.aliyuncs.com")
 	}
 
 	return endpoint
@@ -69,34 +69,34 @@ func Convert(input, output interface{}) {
 	json.Unmarshal(byt, output)
 }
 
-func GetTimestamp() string {
+func GetTimestamp() *string {
 	gmt := time.FixedZone("GMT", 0)
-	return time.Now().In(gmt).Format("2006-01-02T15:04:05Z")
+	return tea.String(time.Now().In(gmt).Format("2006-01-02T15:04:05Z"))
 }
 
-func GetSignatureV1(signedParam map[string]string, method string, secret string) string {
-	stringToSign := buildRpcStringToSignV1(signedParam, method)
-	signature := sign(stringToSign, secret, "&")
-	return signature
+func GetSignatureV1(signedParam map[string]string, method *string, secret *string) *string {
+	stringToSign := buildRpcStringToSignV1(signedParam, tea.StringValue(method))
+	signature := sign(stringToSign, tea.StringValue(secret), "&")
+	return tea.String(signature)
 }
 
-func GetSignature(request *tea.Request, secret string) string {
+func GetSignature(request *tea.Request, secret *string) *string {
 	stringToSign := buildRpcStringToSign(request)
-	signature := sign(stringToSign, secret, "&")
-	return signature
+	signature := sign(stringToSign, tea.StringValue(secret), "&")
+	return tea.String(signature)
 }
 
-func HasError(body map[string]interface{}) bool {
+func HasError(body map[string]interface{}) *bool {
 	if body == nil {
-		return true
+		return tea.Bool(true)
 	}
 	if obj := body["Code"]; obj != nil {
 		code := fmt.Sprintf("%v", body["Code"])
 		if code != "" && code != "0" {
-			return true
+			return tea.Bool(true)
 		}
 	}
-	return false
+	return tea.Bool(false)
 }
 
 func Query(filter map[string]interface{}) map[string]string {
@@ -113,7 +113,7 @@ func Query(filter map[string]interface{}) map[string]string {
 	return result
 }
 
-func GetHost(product string, regionid string, endpoint string) string {
+func GetHost(product *string, regionid *string, endpoint *string) *string {
 	return endpoint
 }
 
@@ -209,7 +209,7 @@ func buildRpcStringToSign(request *tea.Request) (stringToSign string) {
 	stringToSign = strings.Replace(stringToSign, "*", "%2A", -1)
 	stringToSign = strings.Replace(stringToSign, "%7E", "~", -1)
 	stringToSign = url.QueryEscape(stringToSign)
-	stringToSign = request.Method + "&%2F&" + stringToSign
+	stringToSign = tea.StringValue(request.Method) + "&%2F&" + stringToSign
 	return
 }
 
@@ -222,18 +222,18 @@ func getUrlFormedMap(source map[string]string) (urlEncoded string) {
 	return
 }
 
-func GetOpenPlatFormEndpoint(endpoint, regionId string) string {
+func GetOpenPlatFormEndpoint(endpoint, regionId *string) *string {
 	supportRegionId := []string{"ap-southeast-1", "ap-northeast-1", "eu-central-1", "cn-hongkong", "ap-south-1"}
 	ifExist := false
 	for _, value := range supportRegionId {
-		if value == strings.ToLower(regionId) {
+		if value == strings.ToLower(tea.StringValue(regionId)) {
 			ifExist = true
 		}
 	}
-	if regionId != "" && ifExist {
-		strs := strings.Split(endpoint, ".")
-		strs[0] = strs[0] + "." + regionId
-		return strings.Join(strs, ".")
+	if tea.StringValue(regionId) != "" && ifExist {
+		strs := strings.Split(tea.StringValue(endpoint), ".")
+		strs[0] = strs[0] + "." + tea.StringValue(regionId)
+		return tea.String(strings.Join(strs, "."))
 	} else {
 		return endpoint
 	}

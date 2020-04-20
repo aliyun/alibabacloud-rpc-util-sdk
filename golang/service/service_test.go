@@ -22,14 +22,14 @@ type errLength struct {
 }
 
 func Test_GetEndpoint(t *testing.T) {
-	endpoint := GetEndpoint("common.aliyuncs.com", true, "internal")
-	utils.AssertEqual(t, "common-internal.aliyuncs.com", endpoint)
+	endpoint := GetEndpoint(tea.String("common.aliyuncs.com"), tea.Bool(true), tea.String("internal"))
+	utils.AssertEqual(t, "common-internal.aliyuncs.com", tea.StringValue(endpoint))
 
-	endpoint = GetEndpoint("common.aliyuncs.com", true, "accelerate")
-	utils.AssertEqual(t, "oss-accelerate.aliyuncs.com", endpoint)
+	endpoint = GetEndpoint(tea.String("common.aliyuncs.com"), tea.Bool(true), tea.String("accelerate"))
+	utils.AssertEqual(t, "oss-accelerate.aliyuncs.com", tea.StringValue(endpoint))
 
-	endpoint = GetEndpoint("common.aliyuncs.com", true, "")
-	utils.AssertEqual(t, "common.aliyuncs.com", endpoint)
+	endpoint = GetEndpoint(tea.String("common.aliyuncs.com"), tea.Bool(true), tea.String(""))
+	utils.AssertEqual(t, "common.aliyuncs.com", tea.StringValue(endpoint))
 }
 
 type TestCommon struct {
@@ -57,43 +57,43 @@ func Test_GetSignatureV1(t *testing.T) {
 		"test": "ok",
 	}
 
-	sign := GetSignatureV1(signed, "", "accessKeySecret")
-	utils.AssertEqual(t, "jHx/oHoHNrbVfhncHEvPdHXZwHU=", sign)
+	sign := GetSignatureV1(signed, tea.String(""), tea.String("accessKeySecret"))
+	utils.AssertEqual(t, "jHx/oHoHNrbVfhncHEvPdHXZwHU=", tea.StringValue(sign))
 }
 
 func Test_GetSignature(t *testing.T) {
 	req := tea.NewRequest()
 	req.Query["test"] = "ok"
 
-	sign := GetSignature(req, "accessKeySecret")
-	utils.AssertEqual(t, "jHx/oHoHNrbVfhncHEvPdHXZwHU=", sign)
+	sign := GetSignature(req, tea.String("accessKeySecret"))
+	utils.AssertEqual(t, "jHx/oHoHNrbVfhncHEvPdHXZwHU=", tea.StringValue(sign))
 }
 
 func Test_HasError(t *testing.T) {
 	iserror := HasError(nil)
-	utils.AssertEqual(t, true, iserror)
+	utils.AssertEqual(t, true, tea.BoolValue(iserror))
 
 	body := map[string]interface{}{
 		"Code": "200",
 	}
 	iserror = HasError(body)
-	utils.AssertEqual(t, true, iserror)
+	utils.AssertEqual(t, true, tea.BoolValue(iserror))
 
 	body = map[string]interface{}{
 		"Code": 0,
 	}
 	iserror = HasError(body)
-	utils.AssertEqual(t, false, iserror)
+	utils.AssertEqual(t, false, tea.BoolValue(iserror))
 
 	body = map[string]interface{}{
 		"Code": 0.00,
 	}
 	iserror = HasError(body)
-	utils.AssertEqual(t, false, iserror)
+	utils.AssertEqual(t, false, tea.BoolValue(iserror))
 
 	body = make(map[string]interface{})
 	iserror = HasError(body)
-	utils.AssertEqual(t, false, iserror)
+	utils.AssertEqual(t, false, tea.BoolValue(iserror))
 }
 
 func Test_Query(t *testing.T) {
@@ -141,17 +141,17 @@ func Test_flatRepeatedList(t *testing.T) {
 }
 
 func Test_GetHost(t *testing.T) {
-	endpoint := GetHost("", "", "client.aliyuncs.com")
-	utils.AssertEqual(t, "client.aliyuncs.com", endpoint)
+	endpoint := GetHost(tea.String(""), tea.String(""), tea.String("client.aliyuncs.com"))
+	utils.AssertEqual(t, "client.aliyuncs.com", tea.StringValue(endpoint))
 }
 
 func Test_GetOpenPlatFormEndpoint(t *testing.T) {
-	endpoint := GetOpenPlatFormEndpoint("openplatform.aliyuncs.com", "")
-	utils.AssertEqual(t, `openplatform.aliyuncs.com`, endpoint)
+	endpoint := GetOpenPlatFormEndpoint(tea.String("openplatform.aliyuncs.com"), tea.String(""))
+	utils.AssertEqual(t, `openplatform.aliyuncs.com`, tea.StringValue(endpoint))
 
-	endpoint = GetOpenPlatFormEndpoint("openplatform.aliyuncs.com", "cn-hangzhou")
-	utils.AssertEqual(t, `openplatform.aliyuncs.com`, endpoint)
+	endpoint = GetOpenPlatFormEndpoint(tea.String("openplatform.aliyuncs.com"), tea.String("cn-hangzhou"))
+	utils.AssertEqual(t, `openplatform.aliyuncs.com`, tea.StringValue(endpoint))
 
-	endpoint = GetOpenPlatFormEndpoint("openplatform.aliyuncs.com", "ap-northeast-1")
-	utils.AssertEqual(t, `openplatform.ap-northeast-1.aliyuncs.com`, endpoint)
+	endpoint = GetOpenPlatFormEndpoint(tea.String("openplatform.aliyuncs.com"), tea.String("ap-northeast-1"))
+	utils.AssertEqual(t, `openplatform.ap-northeast-1.aliyuncs.com`, tea.StringValue(endpoint))
 }
