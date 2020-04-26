@@ -1,9 +1,73 @@
+/**
+ * This is used for RPC sdk
+ */
+
+/**
+ * If endpointType is internal, use internal endpoint
+ * If serverUse is true and endpointType is accelerate, use accelerate endpoint
+ * Default return endpoint
+ * @param serverUse whether use accelerate endpoint
+ * @param endpointType value must be internal or accelerate
+ * @return the final endpoint
+ */
 static function getEndpoint(endpoint: string, serverUse: boolean, endpointType: string): string;
+
+/**
+ * Deprecated
+ * Get host according to endpoint
+ * @param endpoint the final endpoint
+ * @return the endpoint
+ */
 static function getHost(productId: string, regionId: string, endpoint: string): string;
+
+/**
+ * Get signature according to request and secret
+ * @param request tea request
+ * @param secret AccessKeySecret
+ * @return the signature
+ */
 static function getSignature(request: $Request, secret: string): string;
+
+/**
+ * Get signature according to signedParams, method and secret
+ * @param signedParams params which need to be signed
+ * @param method http method e.g. GET
+ * @param secret AccessKeySecret
+ * @return the signature
+ */
 static function getSignatureV1(signedParams: map[string]string, method: string, secret: string): string;
+
+/**
+ * If code in obj is '' or 0, return true, or return false
+ * @param obj the body which will return when error occured
+ * @return the judged result
+ */
 static function hasError(obj: object): boolean;
+
+/**
+ * Get timestamp
+ * @return the timestamp string
+ */
 static function getTimestamp(): string;
+
+/**
+ * Convert all params of body other than type of readable into content 
+ * @param body source Model
+ * @param content target Model
+ * @return void
+ */
 static function convert(body: $Model, content: $Model): void;
+
+/**
+ * Parse filter into a object which's type is map[string]string
+ * @param filter query param
+ * @return the object
+ */
 static function query(filter: object): map[string]string;
+
+/**
+ * Get endpoint according to endpoint and regionId
+ * @param regionId Id must be ap-southeast-1, ap-northeast-1, eu-central-1, cn-hongkong or ap-south-1
+ * @return the endpoint
+ */
 static function getOpenPlatFormEndpoint(endpoint: string, regionId: string): string;
