@@ -8,7 +8,8 @@
 		"java": "com.aliyun:tea-rpc-util:0.0.9",
 		"csharp": "AlibabaCloud.SDK.Common:0.2.4",
 		"ts": "@alicloud/rpc-util:0.0.2",
-		"php": "alibabacloud/tea-rpc-utils:^0.2.0"
+		"php": "alibabacloud/tea-rpc-utils:^0.2.0",
+		"python": "alibabacloud-rpc-util:0.0.1"
 	},
 	"csharp": {
 		"namespace": "AlibabaCloud.Commons"
@@ -20,5 +21,9 @@
 	"java": {
 		"package": "com.aliyun.common",
 		"className": "Common"
+	},
+	"python": {
+		"package": "alibabacloud-rpc-util",
+		"className": "client"
 	}
 }
