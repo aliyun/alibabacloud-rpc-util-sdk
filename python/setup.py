@@ -19,12 +19,12 @@ import os
 from setuptools import setup, find_packages
 
 """
-Setup module for rpc-util.
+Setup module for alibabacloud-rpc-util.
 Created on 3/24/2020
 @author: Alibaba Cloud
 """
 
-PACKAGE = "rpc_util"
+PACKAGE = "alibabacloudrpcutil"
 DESCRIPTION = "The rpc-util module of alibabaCloud Python SDK."
 AUTHOR = "Alibaba Cloud"
 AUTHOR_EMAIL = "alibaba-cloud-sdk-dev-team@list.alibaba-inc.com"
@@ -62,4 +62,4 @@ setup_args = {
     )
 }
 
-setup(name='alibabacloud-rpc-util', **setup_args)
+setup(name='alibabacloudrpcutil', **setup_args)
