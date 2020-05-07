@@ -1,7 +1,7 @@
 import unittest
 import os
 
-from rpc_util import client
+from alibabacloudrpcutil import client
 from Tea.request import TeaRequest
 from Tea.model import TeaModel
 
