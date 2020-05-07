@@ -107,7 +107,19 @@ class RpcUtils
 
     public static function query($dict)
     {
-        $dot = new Dot($dict);
+        if (null === $dict) {
+            return [];
+        }
+        if ($dict instanceof Model) {
+            $dict = $dict->toMap();
+        }
+        $tmp = [];
+        foreach ($dict as $k => $v) {
+            if (0 !== strpos($k, '_')) {
+                $tmp[$k] = $v;
+            }
+        }
+        $dot = new Dot($tmp);
 
         return $dot->flatten();
     }
