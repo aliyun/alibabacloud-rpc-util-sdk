@@ -13,7 +13,7 @@
 
 ```bash
 # 安装 rpc-util
-pip install alibabacloud-rpc-util
+pip install alibabacloud_rpc_util
 ```
 
 ## 问题

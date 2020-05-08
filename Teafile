@@ -9,7 +9,7 @@
 		"csharp": "AlibabaCloud.SDK.Common:0.2.4",
 		"ts": "@alicloud/rpc-util:0.0.2",
 		"php": "alibabacloud/tea-rpc-utils:^0.2.0",
-		"python": "alibabacloudrpcutil:0.0.1"
+		"python": "alibabacloud_rpc_util:0.0.1"
 	},
 	"csharp": {
 		"namespace": "AlibabaCloud.Commons"
@@ -23,7 +23,7 @@
 		"className": "Common"
 	},
 	"python": {
-		"package": "alibabacloudrpcutil",
+		"package": "alibabacloud_rpc_util",
 		"className": "client"
 	}
 }
