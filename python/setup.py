@@ -24,7 +24,7 @@ Created on 3/24/2020
 @author: Alibaba Cloud
 """
 
-PACKAGE = "alibabacloudrpcutil"
+PACKAGE = "alibabacloud_rpc_util"
 DESCRIPTION = "The rpc-util module of alibabaCloud Python SDK."
 AUTHOR = "Alibaba Cloud"
 AUTHOR_EMAIL = "alibaba-cloud-sdk-dev-team@list.alibaba-inc.com"
@@ -62,4 +62,4 @@ setup_args = {
     )
 }
 
-setup(name='alibabacloudrpcutil', **setup_args)
+setup(name='alibabacloud_rpc_util', **setup_args)

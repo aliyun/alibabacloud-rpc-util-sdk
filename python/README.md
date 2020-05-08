@@ -10,7 +10,7 @@ Python SDK uses a common package management tool named `pip`. If pip is not inst
 
 ```bash
 # Install the rpc-util
-pip install alibabacloud-rpc-util
+pip install alibabacloud_rpc_util
 ```
 
 ## Issues
