@@ -63,7 +63,7 @@ func Test_GetSignatureV1(t *testing.T) {
 
 func Test_GetSignature(t *testing.T) {
 	req := tea.NewRequest()
-	req.Query["test"] = "ok"
+	req.Query["test"] = tea.String("ok")
 
 	sign := GetSignature(req, tea.String("accessKeySecret"))
 	utils.AssertEqual(t, "jHx/oHoHNrbVfhncHEvPdHXZwHU=", tea.StringValue(sign))
