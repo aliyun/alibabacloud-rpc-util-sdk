@@ -201,7 +201,7 @@ func buildRpcStringToSignV1(signedParam map[string]string, method string) (strin
 func buildRpcStringToSign(request *tea.Request) (stringToSign string) {
 	signParams := make(map[string]string)
 	for key, value := range request.Query {
-		signParams[key] = value
+		signParams[key] = tea.StringValue(value)
 	}
 
 	stringToSign = getUrlFormedMap(signParams)
