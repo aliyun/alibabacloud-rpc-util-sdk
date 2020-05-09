@@ -34,7 +34,15 @@ class Client:
 
     @staticmethod
     def get_signature(request, secret):
-        queries = request.query.copy()
+        return Client._get_rpc_signature(request.query, request.method, secret)
+
+    @staticmethod
+    def get_signature_v1(signed_params, method, secret):
+        return Client._get_rpc_signature(signed_params, method, secret)
+
+    @staticmethod
+    def _get_rpc_signature(signed_params, method, secret):
+        queries = signed_params.copy()
         keys = list(queries.keys())
         keys.sort()
 
@@ -48,14 +56,15 @@ class Client:
                 canonicalized_query_string += quote_plus(queries[k], encoding="utf-8")
 
         string_to_sign = ""
-        string_to_sign += request.method
+        string_to_sign += method
         string_to_sign += Client.SEPARATOR
         string_to_sign += quote_plus("/", encoding="utf-8")
         string_to_sign += Client.SEPARATOR
         string_to_sign += quote_plus(
             canonicalized_query_string[1:] if canonicalized_query_string.__len__() > 0 else canonicalized_query_string,
             encoding="utf-8")
-        digest_maker = hmac.new(bytes(secret + Client.SEPARATOR, encoding="utf-8"), bytes(string_to_sign, encoding="utf-8"),
+        digest_maker = hmac.new(bytes(secret + Client.SEPARATOR, encoding="utf-8"),
+                                bytes(string_to_sign, encoding="utf-8"),
                                 digestmod=hashlib.sha1)
         hash_bytes = digest_maker.digest()
         signed_str = str(base64.b64encode(hash_bytes), encoding="utf-8")
