@@ -93,6 +93,14 @@ class TestClient(unittest.TestCase):
         result = Client.get_signature(request, "secret")
         self.assertEqual("XlUyV4sXjOuX5FnjUz9IF9tm5rU=", result)
 
+    def test_get_signature_v1(self):
+        query = {
+            'query': 'test',
+            'body': 'test'
+        }
+        result = Client.get_signature_v1(query, 'GET', 'secret')
+        self.assertEqual("XlUyV4sXjOuX5FnjUz9IF9tm5rU=", result)
+
     def test_has_error(self):
         self.assertTrue(Client.has_error(None))
 
