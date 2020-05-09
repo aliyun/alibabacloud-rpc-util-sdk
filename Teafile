@@ -1,7 +1,7 @@
 {
 	"scope": "alibabacloud",
 	"name": "RPCUtil",
-	"version": "0.2.0",
+	"version": "0.2.1",
 	"main": "./main.tea",
 	"releases": {
 		"go": "github.com/alibabacloud-go/tea-rpc-utils/service:v1.0.0",
@@ -24,6 +24,6 @@
 	},
 	"python": {
 		"package": "alibabacloud_rpc_util",
-		"className": "client"
+		"clientName": "client"
 	}
 }
