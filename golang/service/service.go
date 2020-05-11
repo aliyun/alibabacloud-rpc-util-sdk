@@ -74,7 +74,7 @@ func GetTimestamp() *string {
 	return tea.String(time.Now().In(gmt).Format("2006-01-02T15:04:05Z"))
 }
 
-func GetSignatureV1(signedParam map[string]string, method *string, secret *string) *string {
+func GetSignatureV1(signedParam map[string]*string, method *string, secret *string) *string {
 	stringToSign := buildRpcStringToSignV1(signedParam, tea.StringValue(method))
 	signature := sign(stringToSign, tea.StringValue(secret), "&")
 	return tea.String(signature)
@@ -99,12 +99,12 @@ func HasError(body map[string]interface{}) *bool {
 	return tea.Bool(false)
 }
 
-func Query(filter map[string]interface{}) map[string]string {
+func Query(filter map[string]interface{}) map[string]*string {
 	tmp := make(map[string]interface{})
 	byt, _ := json.Marshal(filter)
 	_ = json.Unmarshal(byt, &tmp)
 
-	result := make(map[string]string)
+	result := make(map[string]*string)
 	for key, value := range tmp {
 		filterValue := reflect.ValueOf(value)
 		flatRepeatedList(filterValue, result, key)
@@ -117,7 +117,7 @@ func GetHost(product *string, regionid *string, endpoint *string) *string {
 	return endpoint
 }
 
-func flatRepeatedList(dataValue reflect.Value, result map[string]string, prefix string) {
+func flatRepeatedList(dataValue reflect.Value, result map[string]*string, prefix string) {
 	if !dataValue.IsValid() {
 		return
 	}
@@ -128,11 +128,11 @@ func flatRepeatedList(dataValue reflect.Value, result map[string]string, prefix 
 	} else if dataType.Kind().String() == "map" {
 		handleMap(dataValue, result, prefix)
 	} else {
-		result[prefix] = fmt.Sprintf("%v", dataValue.Interface())
+		result[prefix] = tea.String(fmt.Sprintf("%v", dataValue.Interface()))
 	}
 }
 
-func handleRepeatedParams(repeatedFieldValue reflect.Value, result map[string]string, prefix string) {
+func handleRepeatedParams(repeatedFieldValue reflect.Value, result map[string]*string, prefix string) {
 	if repeatedFieldValue.IsValid() && !repeatedFieldValue.IsNil() {
 		for m := 0; m < repeatedFieldValue.Len(); m++ {
 			elementValue := repeatedFieldValue.Index(m)
@@ -141,13 +141,13 @@ func handleRepeatedParams(repeatedFieldValue reflect.Value, result map[string]st
 			if fieldValue.Kind().String() == "map" {
 				handleMap(fieldValue, result, key)
 			} else {
-				result[key] = fmt.Sprintf("%v", fieldValue.Interface())
+				result[key] = tea.String(fmt.Sprintf("%v", fieldValue.Interface()))
 			}
 		}
 	}
 }
 
-func handleMap(valueField reflect.Value, result map[string]string, prefix string) {
+func handleMap(valueField reflect.Value, result map[string]*string, prefix string) {
 	if valueField.IsValid() && valueField.String() != "" {
 		valueFieldType := valueField.Type()
 		if valueFieldType.Kind().String() == "map" {
@@ -183,10 +183,10 @@ func shaHmac1(source, secret string) []byte {
 	return hmac.Sum(nil)
 }
 
-func buildRpcStringToSignV1(signedParam map[string]string, method string) (stringToSign string) {
+func buildRpcStringToSignV1(signedParam map[string]*string, method string) (stringToSign string) {
 	signParams := make(map[string]string)
 	for key, value := range signedParam {
-		signParams[key] = value
+		signParams[key] = tea.StringValue(value)
 	}
 
 	stringToSign = getUrlFormedMap(signParams)
