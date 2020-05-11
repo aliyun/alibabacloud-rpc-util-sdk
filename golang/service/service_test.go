@@ -53,8 +53,8 @@ func Test_GetTimestamp(t *testing.T) {
 }
 
 func Test_GetSignatureV1(t *testing.T) {
-	signed := map[string]string{
-		"test": "ok",
+	signed := map[string]*string{
+		"test": tea.String("ok"),
 	}
 
 	sign := GetSignatureV1(signed, tea.String(""), tea.String("accessKeySecret"))
@@ -106,10 +106,10 @@ func Test_Query(t *testing.T) {
 	}
 
 	result := Query(filter)
-	utils.AssertEqual(t, "test", result["client"])
-	utils.AssertEqual(t, "value", result["tag.key"])
-	utils.AssertEqual(t, "str1", result["strs.1"])
-	utils.AssertEqual(t, "str2", result["strs.2"])
+	utils.AssertEqual(t, "test", tea.StringValue(result["client"]))
+	utils.AssertEqual(t, "value", tea.StringValue(result["tag.key"]))
+	utils.AssertEqual(t, "str1", tea.StringValue(result["strs.1"]))
+	utils.AssertEqual(t, "str2", tea.StringValue(result["strs.2"]))
 }
 
 func Test_flatRepeatedList(t *testing.T) {
@@ -128,16 +128,16 @@ func Test_flatRepeatedList(t *testing.T) {
 		},
 	}
 
-	result := make(map[string]string)
+	result := make(map[string]*string)
 	for key, value := range filter {
 		filterValue := reflect.ValueOf(value)
 		flatRepeatedList(filterValue, result, key)
 	}
-	utils.AssertEqual(t, result["slice.1.map"], "valid")
-	utils.AssertEqual(t, result["slice.2"], "6")
-	utils.AssertEqual(t, result["map.value"], "ok")
-	utils.AssertEqual(t, result["client"], "test")
-	utils.AssertEqual(t, result["slice.1.map"], "valid")
+	utils.AssertEqual(t, tea.StringValue(result["slice.1.map"]), "valid")
+	utils.AssertEqual(t, tea.StringValue(result["slice.2"]), "6")
+	utils.AssertEqual(t, tea.StringValue(result["map.value"]), "ok")
+	utils.AssertEqual(t, tea.StringValue(result["client"]), "test")
+	utils.AssertEqual(t, tea.StringValue(result["slice.1.map"]), "valid")
 }
 
 func Test_GetHost(t *testing.T) {
