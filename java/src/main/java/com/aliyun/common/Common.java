@@ -43,11 +43,33 @@ public class Common {
     }
 
     public static Map<String, String> query(Map<String, Object> map) {
-        Map<String, String> outMap = new HashMap<>(16);
+        Map<String, String> outMap = new HashMap<>();
         if (null != map) {
-            map.forEach((k, v) -> outMap.put(k, v == null ? "" : String.valueOf(v)));
+            processeObject(outMap, "", map);
         }
         return outMap;
+    }
+
+    private static void processeObject(Map<String, String> map, String key, Object value) {
+        if (StringUtils.isEmpty(value)) {
+            return;
+        }
+        if (value instanceof List) {
+            List list = (List) value;
+            for (int i = 0; i < list.size(); i++) {
+                processeObject(map, key + "." + (i + 1), list.get(i));
+            }
+        } else if (value instanceof Map) {
+            Map<String, Object> subMap = (Map<String, Object>) value;
+            for (Map.Entry<String, Object> entry : subMap.entrySet()) {
+                processeObject(map, key + "." + (entry.getKey()), entry.getValue());
+            }
+        } else {
+            if (key.startsWith(".")) {
+                key = key.substring(1);
+            }
+            map.put(key, String.valueOf(value));
+        }
     }
 
     public static String readAsString(InputStream input) throws IOException {
