@@ -2,7 +2,6 @@
 
 namespace AlibabaCloud\Tea\RpcUtils;
 
-use Adbar\Dot;
 use AlibabaCloud\Tea\Model;
 use AlibabaCloud\Tea\Request;
 use Psr\Http\Message\StreamInterface;
@@ -119,9 +118,8 @@ class RpcUtils
                 $tmp[$k] = $v;
             }
         }
-        $dot = new Dot($tmp);
 
-        return $dot->flatten();
+        return self::flatten($tmp);
     }
 
     public static function getOpenPlatFormEndpoint($endpoint, $regionId)
@@ -135,6 +133,25 @@ class RpcUtils
         }
 
         return $endpoint;
+    }
+
+    private static function flatten($items = [], $delimiter = '.', $prepend = '')
+    {
+        $flatten = [];
+
+        foreach ($items as $key => $value) {
+            $pos = \is_int($key) ? $key + 1 : $key;
+            if (\is_array($value) && !empty($value)) {
+                $flatten = array_merge(
+                    $flatten,
+                    self::flatten($value, $delimiter, $prepend . $pos . $delimiter)
+                );
+            } else {
+                $flatten[$prepend . $pos] = $value;
+            }
+        }
+
+        return $flatten;
     }
 
     private static function getStrToSign($method, $query)

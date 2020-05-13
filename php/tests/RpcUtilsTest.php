@@ -95,11 +95,15 @@ class RpcUtilsTest extends TestCase
             'b2' => [
                 'a' => 'a',
             ],
+            'c'=> ['x', 'y', 'z'],
         ];
         $this->assertEquals([
             'a'    => 'a',
             'b1.a' => 'a',
             'b2.a' => 'a',
+            'c.1'  => 'x',
+            'c.2'  => 'y',
+            'c.3'  => 'z',
         ], RpcUtils::query($array));
     }
 
