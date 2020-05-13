@@ -10,7 +10,6 @@
       }
     ],
     "require": {
-        "adbario/php-dot-notation": "^2.2",
         "alibabacloud/tea": "^3.1"
     },
     "require-dev": {
