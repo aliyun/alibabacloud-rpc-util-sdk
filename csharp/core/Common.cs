@@ -1,18 +1,15 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
-using System.Text.RegularExpressions;
 
-using AlibabaCloud.Commons.Models;
 
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 using Tea;
 using Tea.Utils;
@@ -103,11 +100,42 @@ namespace AlibabaCloud.Commons
         public static Dictionary<string, string> Query(Dictionary<string, object> dict)
         {
             Dictionary<string, string> outDict = new Dictionary<string, string>();
-            foreach (var keypair in dict)
-            {
-                outDict.Add(keypair.Key, keypair.Value.ToSafeString(""));
-            }
+            TileDict(outDict, dict);
             return outDict;
+        }
+
+        internal static void TileDict(Dictionary<string, string> dicOut, object obj, string parentKey = "")
+        {
+            if (obj == null)
+            {
+                return;
+            }
+            if (typeof(IDictionary).IsAssignableFrom(obj.GetType()))
+            {
+                Dictionary<string, object> dicIn = ((IDictionary) obj).Keys.Cast<string>().ToDictionary(key => key, key => ((IDictionary) obj) [key]);
+                foreach (var keypair in dicIn)
+                {
+                    string keyName = parentKey + "." + keypair.Key;
+                    if (keypair.Value == null)
+                    {
+                        continue;
+                    }
+                    TileDict(dicOut, keypair.Value, keyName);
+                }
+            }
+            else if (typeof(IList).IsAssignableFrom(obj.GetType()))
+            {
+                int index = 1;
+                foreach (var temp in (IList) obj)
+                {
+                    TileDict(dicOut, temp, parentKey + "." + index.ToSafeString());
+                    index++;
+                }
+            }
+            else
+            {
+                dicOut.Add(parentKey.TrimStart('.'), obj.ToSafeString(""));
+            }
         }
 
         public static string GetHost(string product, string regionid, string endpoint)
@@ -120,7 +148,7 @@ namespace AlibabaCloud.Commons
             return endpoint;
         }
 
-        public static string GetSignatureV1(Dictionary<string,string> signedParams, string method, string secret)
+        public static string GetSignatureV1(Dictionary<string, string> signedParams, string method, string secret)
         {
             return GetRpcSignedStr(signedParams, method, secret);
         }
@@ -133,11 +161,11 @@ namespace AlibabaCloud.Commons
 
             foreach (string key in sortedKeys)
             {
-                if(!string.IsNullOrEmpty(queries[key]))
+                if (!string.IsNullOrEmpty(queries[key]))
                 {
                     canonicalizedQueryString.Append("&")
-                    .Append(PercentEncode(key)).Append("=")
-                    .Append(PercentEncode(queries[key]));
+                        .Append(PercentEncode(key)).Append("=")
+                        .Append(PercentEncode(queries[key]));
                 }
             }
             StringBuilder stringToSign = new StringBuilder();

@@ -68,11 +68,10 @@ namespace tests
         [Fact]
         public void Test_GetSignature()
         {
-            TeaRequest request = new TeaRequest(); 
+            TeaRequest request = new TeaRequest();
             request.Method = "GET";
             Dictionary<string, string> query = new Dictionary<string, string>
-            { 
-                { "query", "test" },
+            { { "query", "test" },
                 { "body", "test" },
             };
             request.Query = query;
@@ -84,8 +83,7 @@ namespace tests
         public void Test_GetSignatureV1()
         {
             Dictionary<string, string> query = new Dictionary<string, string>
-            { 
-                { "query", "test" },
+            { { "query", "test" },
                 { "body", "test" },
             };
             string result = Common.GetSignatureV1(query, "GET", "secret");
@@ -116,8 +114,33 @@ namespace tests
             Dictionary<string, object> dicObj = new Dictionary<string, object>();
             dicObj.Add("test", "test");
             dicObj.Add("key", "value");
+            dicObj.Add("null", null);
+            Dictionary<string, object> subDict = new Dictionary<string, object>();
+            subDict.Add("subKey", "subValue");
+            subDict.Add("subTest", "subTest");
+            subDict.Add("subListInt", new List<int> { 1, 2, 3 });
+            subDict.Add("subNull", null);
+            subDict.Add("subListDict", new List<Dictionary<string, object>>
+            {
+                new Dictionary<string, object> { { "a", "b" }, { "c", "d" } },
+                new Dictionary<string, object> { { "e", "f" }, { "g", "h" } },
+            });
+            dicObj.Add("sub", subDict);
+            List<object> listObj = new List<object>
+            {
+                new Dictionary<string, object> { { "a", "b" }, { "c", "d" } },
+                5,
+                new List<string> { "list1", "list2" }
+            };
+
+            dicObj.Add("slice", listObj);
+            Dictionary<string, string> dicQuery = Common.Query(dicObj);
             Assert.NotNull(Common.Query(dicObj));
-            Assert.Equal(2, Common.Query(dicObj).Count);
+            Assert.Equal("5", dicQuery["slice.2"]);
+            Assert.Equal("value", dicQuery["key"]);
+            Assert.Equal("1", dicQuery["sub.subListInt.1"]);
+            Assert.Equal("d", dicQuery["sub.subListDict.1.c"]);
+            Assert.Equal("list1", dicQuery["slice.3.1"]);
         }
 
         [Fact]
