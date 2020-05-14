@@ -1,3 +1,6 @@
+### 2020-05-14 Version 0.2.5
+* Fixed `Query()`
+
 ### 2020-04-13 Version 0.2.4
 * Supported `GetSignatureV1()`
 
