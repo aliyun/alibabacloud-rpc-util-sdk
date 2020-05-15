@@ -141,11 +141,59 @@ class TestClient(unittest.TestCase):
             self.assertEqual(2, map_model.sub_model.id)
 
     def test_query(self):
-        dic = {}
-        dic["test"] = 1
-        dic["key"] = "value"
-        self.assertIsNotNone(Client.query(dic))
-        self.assertEqual("1", Client.query(dic).get("test"))
+        result = Client.query(None)
+        self.assertEqual(0, len(result))
+        dic = {
+            'str_test': 'test',
+            'none_test': None,
+            'int_test': 1
+        }
+        result = Client.query(dic)
+        self.assertEqual('test', result.get('str_test'))
+        self.assertIsNone(result.get("none_test"))
+        self.assertEqual("1", result.get("int_test"))
+
+        fl = [1, None]
+        sub_dict_fl = {
+            'none_test': None,
+            'int_test': 2,
+            'str_test': 'test'
+        }
+        fl.append(sub_dict_fl)
+        sl = [1, None]
+        fl.append(sl)
+        dic['list'] = fl
+        result = Client.query(dic)
+        self.assertEqual("1", result.get("list.1"))
+        self.assertIsNone(result.get("list.2"))
+        self.assertEqual("1", result.get("int_test"))
+        self.assertEqual("2", result.get("list.3.int_test"))
+        self.assertIsNone(result.get("list.3.none_test"))
+        self.assertEqual("test", result.get("list.3.str_test"))
+        self.assertEqual("1", result.get("list.4.1"))
+
+        sub_map_fd = {
+            'none_test': None,
+            'int_test': 2,
+            'str_test': 'test'
+        }
+        fd = {
+            'first_map_map': sub_map_fd,
+            'first_map_list': sl,
+            'none_test': None,
+            'int_test': 2,
+            'str_test': 'test'
+        }
+        dic['map'] = fd
+
+        result = Client.query(dic)
+        self.assertEqual("1", result.get("map.first_map_list.1"))
+        self.assertIsNone(result.get("map.none_test"))
+        self.assertEqual("2", result.get("map.int_test"))
+        self.assertEqual("test", result.get("map.str_test"))
+        self.assertIsNone(result.get("map.first_map_map.none_test"))
+        self.assertEqual("2", result.get("map.first_map_map.int_test"))
+        self.assertEqual("test", result.get("map.first_map_map.str_test"))
 
     def test_get_open_plat_form_endpoint(self):
         self.assertEqual("openplatform.aliyuncs.com",

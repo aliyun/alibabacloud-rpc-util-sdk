@@ -103,10 +103,28 @@ class Client:
 
     @staticmethod
     def query(dic):
-        out_dic = {}
-        for k in dic:
-            out_dic[k] = str(dic[k]) if dic[k] is not None else ""
-        return out_dic
+        out_dict = {}
+        if dic:
+            Client._object_handler('', dic, out_dict)
+        return out_dict
+
+    @staticmethod
+    def _object_handler(key, value, out):
+        if value is None:
+            return
+
+        if isinstance(value, dict):
+            dic = value
+            for k, v in dic.items():
+                Client._object_handler('%s.%s' % (key, k), v, out)
+        elif isinstance(value, (list, tuple)):
+            lis = value
+            for index, val in enumerate(lis):
+                Client._object_handler('%s.%s' % (key, index+1), val, out)
+        else:
+            if key.startswith('.'):
+                key = key[1:]
+            out[key] = str(value)
 
     @staticmethod
     def get_open_plat_form_endpoint(endpoint, region_id):
