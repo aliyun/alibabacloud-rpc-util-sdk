@@ -6,7 +6,6 @@ import com.aliyun.tea.TeaModel;
 import com.aliyun.tea.TeaRequest;
 import com.aliyun.tea.TeaResponse;
 import com.aliyun.tea.utils.StringUtils;
-import com.aliyuncs.pop.RPCClient;
 import com.google.gson.Gson;
 
 import javax.crypto.Mac;
@@ -27,22 +26,15 @@ public class Common {
     public final static String SEPARATOR = "&";
     public final static String URL_ENCODING = "UTF-8";
     public static final String ALGORITHM_NAME = "HmacSHA1";
+    public static final String coreVersion = "0.1.0";
 
     static {
         Properties sysProps = System.getProperties();
-        String coreVersion = "";
-        Properties props = new Properties();
-        try {
-            props.load(RPCClient.class.getClassLoader().getResourceAsStream("project.properties"));
-            coreVersion = props.getProperty("sdk.project.version");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         defaultUserAgent = String.format("AlibabaCloud (%s; %s) Java/%s %s/%s TeaDSL/1", sysProps.getProperty("os.name"), sysProps
                 .getProperty("os.arch"), sysProps.getProperty("java.runtime.version"), "Common", coreVersion);
     }
 
-    public static Map<String, String> query(Map<String, Object> map) {
+    public static Map<String, String> query(Map<String, ?> map) {
         Map<String, String> outMap = new HashMap<>();
         if (null != map) {
             processeObject(outMap, "", map);
@@ -129,7 +121,7 @@ public class Common {
         return false;
     }
 
-    public static InputStream toForm(Map<String, Object> map, InputStream sourceFile, String boundary) throws Exception {
+    public static InputStream toForm(Map<String, ?> map, InputStream sourceFile, String boundary) throws Exception {
         InputStream is;
         OutputStream os = new ByteArrayOutputStream();
         if (null == map) {
@@ -146,7 +138,7 @@ public class Common {
             }
 
         }
-        for (Map.Entry<String, Object> entry : map.entrySet()) {
+        for (Map.Entry<String, ?> entry : map.entrySet()) {
             if (!StringUtils.isEmpty(entry.getValue())) {
                 stringBuilder.append("--").append(boundary).append("\r\n");
                 stringBuilder.append("Content-Disposition: form-data; name=\"").append(entry.getKey()).append("\"\r\n\r\n");
@@ -252,7 +244,7 @@ public class Common {
         return map;
     }
 
-    public static boolean hasError(Map<String, Object> body) {
+    public static boolean hasError(Map<String, ?> body) {
         if (null == body) {
             return true;
         }
