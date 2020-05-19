@@ -4,9 +4,10 @@ import hmac
 import base64
 
 from datetime import datetime
-from _io import TextIOWrapper
 from urllib.parse import quote_plus
+
 from Tea.model import TeaModel
+from Tea.stream import STREAM_CLASS
 
 
 class Client:
@@ -89,15 +90,11 @@ class Client:
 
     @staticmethod
     def convert(body, content):
-        prop_list = [(p, not callable(getattr(body, p)) and p[0] != "_")
-                     for p in dir(body)]
         pros = {}
-        for i in prop_list:
-            if i[1]:
-                val = getattr(body, i[0])
-                if not isinstance(val, TextIOWrapper):
-                    pros[body._names.get(i[0]) or i[0]] = copy.deepcopy(
-                        val if not isinstance(val, TeaModel) else val.to_map())
+        body_map = body.to_map()
+        for k, v in body_map.items():
+            if not isinstance(v, STREAM_CLASS):
+                pros[k] = copy.deepcopy(v)
 
         content.from_map(pros)
 
