@@ -50,7 +50,7 @@ class Client:
         canonicalized_query_string = ""
 
         for k in keys:
-            if queries[k]:
+            if queries[k] is not None:
                 canonicalized_query_string += "&"
                 canonicalized_query_string += quote_plus(k, encoding="utf-8")
                 canonicalized_query_string += "="
