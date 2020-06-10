@@ -20,10 +20,6 @@ function parseXML(body: string): any {
   return result.output;
 }
 
-function firstLetterUpper(str: string): string {
-  return str.slice(0, 1).toUpperCase() + str.slice(1);
-}
-
 function encode(str: string) {
   var result = encodeURIComponent(str);
 
@@ -34,31 +30,47 @@ function encode(str: string) {
     .replace(/\*/g, '%2A');
 }
 
-function replaceRepeatList(target: { [key: string]: any }, key: string, repeat: any[]) {
+function replaceRepeatList(target: { [key: string]: string }, repeat: any[], prefix: string) {
+  if (prefix) {
+    prefix = prefix + '.';
+  }
   for (var i = 0; i < repeat.length; i++) {
     var item = repeat[i];
-
-    if (item && typeof item === 'object') {
-      const keys = Object.keys(item);
-      for (var j = 0; j < keys.length; j++) {
-        target[`${key}.${i + 1}.${keys[j]}`] = item[keys[j]];
-      }
+    let key = prefix + (i + 1);
+    if (typeof item === 'undefined' || item == null) {
+      target[key] = '';
+      continue;
+    }
+    if (Array.isArray(item)) {
+      replaceRepeatList(target, item, key);
+    } else if (item instanceof Object) {
+      flatMap(target, item, key);
     } else {
-      target[`${key}.${i + 1}`] = item;
+      target[key] = item.toString();
     }
   }
 }
 
-function flatParams(params: { [key: string]: any }) {
-  var target: { [key: string]: any } = {};
-  var keys = Object.keys(params);
+function flatMap(target: { [key: string]: any }, params: { [key: string]: any }, prefix: string = '') {
+  if (prefix) {
+    prefix = prefix + '.';
+  }
+  let keys = Object.keys(params);
   for (let i = 0; i < keys.length; i++) {
-    var key = keys[i];
-    var value = params[key];
+    let key = keys[i];
+    let value = params[key];
+    key = prefix + key;
+    if (typeof value === 'undefined' || value == null) {
+      target[key] = '';
+      continue;
+    }
+
     if (Array.isArray(value)) {
-      replaceRepeatList(target, key, value);
-    } else {
-      target[key] = value;
+      replaceRepeatList(target, value, key);
+    } else if (value instanceof Object){ 
+      flatMap(target, value, key);
+    }else {
+      target[key] = value.toString();
     }
   }
   return target;
@@ -66,7 +78,8 @@ function flatParams(params: { [key: string]: any }) {
 
 function normalize(params: { [key: string]: any }) {
   var list = [];
-  var flated = flatParams(params);
+  var flated: { [key: string]: string } = {};
+  flatMap(flated, params);
   var keys = Object.keys(flated).sort();
   for (let i = 0; i < keys.length; i++) {
     var key = keys[i];
@@ -321,14 +334,7 @@ export default class Client {
       return {};
     }
     let ret: { [key: string]: string } = {};
-    for (let [key, value] of Object.entries(filter)) {
-      key = firstLetterUpper(key);
-      if (typeof value === 'undefined' || value == null) {
-        ret[key] = '';
-        continue;
-      }
-      ret[key] = value.toString();
-    }
+    flatMap(ret, filter);
     return ret;
   }
 
