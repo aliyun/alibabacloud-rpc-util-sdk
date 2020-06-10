@@ -183,14 +183,56 @@ describe('base client', function () {
       val2: undefined,
       val3: null,
       val4: 1,
-      val5: true
+      val5: true,
+      val6: {
+        subval1: 'string', 
+        subval2: 1,
+        subval3: true,
+        subval4: null,
+        subval5: [
+          '1',
+          2,
+          true,
+          {
+            val1: 'string'
+          }
+        ],
+      },
+      val7: [
+        '1',
+        2,
+        undefined,
+        null,
+        true,
+        {
+          val1: 'string'
+        },
+        [
+          'substring'
+        ]
+      ]
     };
     assert.deepStrictEqual(BaseClient.query(data), {
-      Val1: 'string',
-      Val2: '',
-      Val3: '',
-      Val4: '1',
-      Val5: 'true'
+      val1: 'string',
+      val2: '',
+      val3: '',
+      val4: '1',
+      val5: 'true',
+      'val6.subval1': 'string',
+      'val6.subval2': '1',
+      'val6.subval3': 'true',
+      'val6.subval4': '',
+      'val6.subval5.1': '1',
+      'val6.subval5.2': '2',
+      'val6.subval5.3': 'true',
+      'val6.subval5.4.val1': 'string',
+      'val7.1': '1',
+      'val7.2': '2',
+      'val7.3': '',
+      'val7.4': '',
+      'val7.5': 'true',
+      'val7.6.val1': 'string',
+      'val7.7.1': 'substring',
     });
     assert.deepStrictEqual(BaseClient.query(undefined), {});
   });
@@ -514,33 +556,41 @@ describe('private methods', function () {
 
   it('replaceRepeatList should ok', function () {
     const replaceRepeatList = client.__get__('replaceRepeatList');
-    function helper(target: any, key: any, repeat: any) {
-      replaceRepeatList(target, key, repeat);
+    function helper(target: any, repeat: any, key: any) {
+      replaceRepeatList(target, repeat, key);
       return target;
     }
-    assert.deepEqual(helper({}, 'key', []), {})
-    assert.deepEqual(helper({}, 'key', ['value']), {
+    assert.deepEqual(helper({}, [], 'key'), {})
+    assert.deepEqual(helper({}, ['value'], 'key'), {
       'key.1': 'value'
     })
-    assert.deepEqual(helper({}, 'key', [{
+    assert.deepEqual(helper({}, [{
       Domain: '1.com'
-    }]), {
+    }], 'key'), {
       'key.1.Domain': '1.com'
     })
   });
 
-  it('flatParams should ok', function () {
-    const flatParams = client.__get__('flatParams');
-    assert.deepEqual(flatParams({}), {})
-    assert.deepEqual(flatParams({ key: ['value'] }), { 'key.1': 'value' })
-    assert.deepEqual(flatParams({ 'key': 'value' }), { 'key': 'value' })
-    assert.deepEqual(flatParams({
+  it('flatMap should ok', function () {
+    const flatMap = client.__get__('flatMap');
+    let ret = {};
+    flatMap(ret, {});
+    assert.deepEqual(ret, {});
+    ret = {}
+    flatMap(ret, { key: ['value'] });
+    assert.deepEqual(ret, { 'key.1': 'value' });
+    ret = {}
+    flatMap(ret, { 'key': 'value' });
+    assert.deepEqual(ret, { 'key': 'value' });
+    ret = {}
+    flatMap(ret, {
       key: [
         {
           Domain: '1.com'
         }
       ]
-    }), { 'key.1.Domain': '1.com' })
+    })
+    assert.deepEqual(ret, { 'key.1.Domain': '1.com' })
   });
 
   it('canonicalize should ok', function () {
