@@ -4,9 +4,8 @@ import hmac
 import base64
 
 from datetime import datetime
-from urllib.parse import quote_plus
+from urllib.parse import quote_plus, quote
 
-from Tea.model import TeaModel
 from Tea.stream import STREAM_CLASS
 
 
@@ -52,9 +51,9 @@ class Client:
         for k in keys:
             if queries[k] is not None:
                 canonicalized_query_string += "&"
-                canonicalized_query_string += quote_plus(k, encoding="utf-8")
+                canonicalized_query_string += quote(k, safe='',  encoding="utf-8")
                 canonicalized_query_string += "="
-                canonicalized_query_string += quote_plus(queries[k], encoding="utf-8")
+                canonicalized_query_string += quote(queries[k], safe='', encoding="utf-8")
 
         string_to_sign = ""
         string_to_sign += method
