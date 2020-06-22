@@ -81,12 +81,10 @@ function run_python {
   cd python || return 126
   python setup.py build
   python setup.py install
-  cd tests || return 126
   pip install coverage
+  pip install alibabacloud-tea
 
-  coverage run --source="rpc_util.client" run_test.py
-  cd ../../
-  upload_codecov_report python python
+  coverage run --source="./alibabacloud_rpc_util" ./tests/run_test.py
 }
 
 function contains {
