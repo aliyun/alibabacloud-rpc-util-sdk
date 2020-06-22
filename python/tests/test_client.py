@@ -7,72 +7,58 @@ from Tea.model import TeaModel
 
 
 class TestClient(unittest.TestCase):
-    class _TeaModel(TeaModel):
-        _base_type = {int, float, bool, complex, str}
-        _list_type = {list, tuple, set}
-        _dict_type = {dict}
 
-        def _entity_to_dict(self, obj):
-            if type(obj) in self._dict_type:
-                obj_rtn = {k: self._entity_to_dict(v) for k, v in obj.items()}
-                return obj_rtn
-            elif type(obj) in self._list_type:
-                return [self._entity_to_dict(v) for v in obj]
-            elif type(obj) in self._base_type:
-                return obj
-            elif isinstance(obj, TeaModel):
-                prop_list = [(p, not callable(getattr(obj, p)) and p[0] != "_")
-                             for p in dir(obj)]
-                obj_rtn = {}
-                for i in prop_list:
-                    if i[1]:
-                        obj_rtn[obj._names.get(i[0]) or i[0]] = self._entity_to_dict(
-                            getattr(obj, i[0]))
-                return obj_rtn
-
-        def to_map(self):
-            prop_list = [(p, not callable(getattr(self, p)) and p[0] != "_")
-                         for p in dir(self)]
-            pros = {}
-            for i in prop_list:
-                if i[1]:
-                    pros[self._names.get(i[0]) or i[0]] = self._entity_to_dict(
-                        getattr(self, i[0]))
-            return pros
-
-    class TestConvertModel(_TeaModel):
+    class TestConvertModel:
         def __init__(self):
-            super().__init__()
             self.requestId = "test"
-            self._names["requestId"] = "RequestId"
             self.dic = {}
             self.no_map = 1
             self.sub_model = None
             self.file = None
 
-    class TestConvertSubModel(_TeaModel):
+        def to_map(self):
+            dic = {
+                'requestId': self.requestId,
+                'dic': self.dic,
+                'no_map': self.no_map,
+                'sub_model': self.sub_model,
+                'file': self.file
+            }
+            return dic
+
+    class TestConvertSubModel:
         def __init__(self):
-            super().__init__()
             self.requestId = "subTest"
-            self._names["requestId"] = "RequestId"
             self.id = 2
 
-    class TestConvertMapModel(_TeaModel):
+        def to_map(self):
+            dic = {
+                'requestId': self.requestId,
+                'id': self.id
+            }
+            return dic
+
+    class TestConvertMapModel:
         def __init__(self):
-            super().__init__()
             self.requestId = ""
-            self._names["requestId"] = "RequestId"
             self.extendId = 0
             self.dic = {}
             self.sub_model = None
 
+        def to_map(self):
+            dic = {
+                'requestId': self.requestId,
+                'dic': self.dic,
+                'extendId': self.extendId,
+                'sub_model': self.sub_model,
+            }
+            return dic
+
         def from_map(self, dic):
-            self.requestId = dic.get("RequestId") or ""
+            self.requestId = dic.get("requestId") or ""
             self.extendId = dic.get("extendId") or 0
             self.dic = dic.get("dic")
-            self.sub_model = TestClient.TestConvertSubModel()
-            self.sub_model.requestId = dic.get("sub_model").get("RequestId")
-            self.sub_model.id = dic.get("sub_model").get("id")
+            self.sub_model = dic.get("sub_model")
 
     def test_get_endpoint(self):
         self.assertEqual("test", Client.get_endpoint("test", False, ""))
