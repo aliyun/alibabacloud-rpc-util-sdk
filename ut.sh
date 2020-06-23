@@ -85,6 +85,8 @@ function run_python {
   pip install alibabacloud-tea
 
   coverage run --source="./alibabacloud_rpc_util" ./tests/run_test.py
+  cd ../
+  upload_codecov_report python python
 }
 
 function contains {
