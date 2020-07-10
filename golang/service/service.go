@@ -60,6 +60,7 @@ func Convert(input, output interface{}) {
 	for i := 0; i < dataType.NumField(); i++ {
 		field := dataType.Field(i)
 		name, _ := field.Tag.Lookup("json")
+		name = strings.Split(name, ",omitempty")[0]
 		_, ok := val.Field(i).Interface().(io.Reader)
 		if !ok {
 			res[name] = val.Field(i).Interface()
