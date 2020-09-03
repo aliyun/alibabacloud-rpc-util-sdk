@@ -82,7 +82,7 @@ public class Common {
         if ("internal".equals(endpointType)) {
             String[] strs = endpoint.split("\\.");
             strs[0] += "-internal";
-            endpoint = String.join(".", strs);
+            endpoint = StringUtils.join(".", Arrays.asList(strs));
         }
         if (useAccelerate && "accelerate".equals(endpointType)) {
             return "oss-accelerate.aliyuncs.com";
@@ -299,7 +299,7 @@ public class Common {
         if (ifExist) {
             String[] strs = endpoint.split("\\.");
             strs[0] = strs[0] + "." + regionId;
-            return String.join(".", strs);
+            return StringUtils.join(".", Arrays.asList(strs));
         } else {
             return endpoint;
         }
