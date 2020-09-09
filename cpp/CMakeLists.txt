@@ -10,6 +10,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 message("C++ compiler flags: ${CMAKE_CXX_FLAGS}")
 
+option(ENABLE_UNIT_TESTS "Enable unit tests" OFF)
 message(STATUS "Enable testing: ${ENABLE_UNIT_TESTS}")
 
 if (CMAKE_CXX_COMPILER_LOADED)
@@ -53,6 +54,24 @@ set_target_properties(${PROJECT_NAME}
 
 add_subdirectory(external/libraries)
 target_link_libraries(${PROJECT_NAME} PRIVATE )
+
+if (ENABLE_UNIT_TESTS)
+    include(CTest)
+    enable_testing()
+    add_subdirectory(external/libraries_dev)
+    add_executable(tests
+            tests/main.cpp)
+    target_include_directories(tests
+            PRIVATE
+            ${CMAKE_CURRENT_SOURCE_DIR}/include)
+    target_link_libraries(tests
+            PRIVATE
+            ${PROJECT_NAME}
+            gtest_main
+            gmock_main)
+    add_test(NAME google_test
+            COMMAND $<TARGET_FILE:tests>)
+endif ()
 
 message(STATUS "Project will be installed to ${CMAKE_INSTALL_PREFIX}")
 
