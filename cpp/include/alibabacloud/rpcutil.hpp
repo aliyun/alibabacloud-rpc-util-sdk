@@ -1,5 +1,3 @@
-// This file is auto-generated, don't edit it. Thanks.
-
 #ifndef ALIBABACLOUD_RPCUTIL_H_
 #define ALIBABACLOUD_RPCUTIL_H_
 
@@ -17,15 +15,17 @@ public:
   Client();
   ~Client();
 
-  string getEndpoint(string endpoint, bool serverUse, string endpointType);
-  string getHost(string productId, string regionId, string endpoint);
-  string getSignature(Request request, string secret);
-  string getSignatureV1(map<string, string> signedParams, string method, string secret);
-  bool hasError(map<string, boost::any> obj);
-  string getTimestamp();
-  void convert(Model body, Model content);
-  map<string, string> query(map<string, boost::any> filter);
-  string getOpenPlatFormEndpoint(string endpoint, string regionId);
+  static string getEndpoint(string endpoint, bool serverUse,
+                            const string &endpointType);
+  static string getHost(string productId, string regionId, string endpoint);
+  static string getSignature(Request request, string secret);
+  static string getSignatureV1(const map<string, string> &signedParams,
+                               string method, string secret);
+  static bool hasError(map<string, boost::any> obj);
+  static string getTimestamp();
+  static void convert(Model body, Model content);
+  static map<string, string> query(const map<string, boost::any> &filter);
+  static string getOpenPlatFormEndpoint(string endpoint, string regionId);
 };
 } // namespace Alibabacloud_RPCUtil
 
