@@ -68,7 +68,8 @@ if (ENABLE_UNIT_TESTS)
             PRIVATE
             ${PROJECT_NAME}
             gtest_main
-            gmock_main)
+            gmock_main
+            darabonba_core)
     add_test(NAME google_test
             COMMAND $<TARGET_FILE:tests>)
 endif ()
