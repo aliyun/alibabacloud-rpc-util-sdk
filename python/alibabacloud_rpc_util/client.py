@@ -160,7 +160,11 @@ class Client:
         else:
             if key.startswith('.'):
                 key = key[1:]
-            out[key] = str(value)
+            
+            if isinstance(value, bytes):
+                out[key] = str(value, encoding='utf-8')
+            else:
+                out[key] = str(value)
 
     @staticmethod
     def get_open_plat_form_endpoint(endpoint, region_id):

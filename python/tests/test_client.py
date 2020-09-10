@@ -131,11 +131,13 @@ class TestClient(unittest.TestCase):
         self.assertEqual(0, len(result))
         dic = {
             'str_test': 'test',
+            'bytes_test': b'test',
             'none_test': None,
             'int_test': 1
         }
         result = Client.query(dic)
         self.assertEqual('test', result.get('str_test'))
+        self.assertEqual('test', result.get('bytes_test'))
         self.assertIsNone(result.get("none_test"))
         self.assertEqual("1", result.get("int_test"))
 
