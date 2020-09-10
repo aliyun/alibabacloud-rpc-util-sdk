@@ -23,7 +23,7 @@ public:
                                string method, string secret);
   static bool hasError(map<string, boost::any> obj);
   static string getTimestamp();
-  static void convert(Model body, Model content);
+  static void convert(Model& body, Model& content);
   static map<string, string> query(const map<string, boost::any> &filter);
   static string getOpenPlatFormEndpoint(string endpoint, string regionId);
 };
