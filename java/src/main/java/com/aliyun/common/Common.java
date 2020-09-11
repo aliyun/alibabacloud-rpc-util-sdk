@@ -13,10 +13,7 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
 import java.io.*;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URLEncoder;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -64,17 +61,21 @@ public class Common {
         }
     }
 
-    public static String readAsString(InputStream input) throws IOException {
-        if (input == null) {
-            return "";
+    public static String readAsString(InputStream input) {
+        try {
+            if (input == null) {
+                return "";
+            }
+            byte[] bcache = new byte[4096];
+            int index;
+            ByteArrayOutputStream infoStream = new ByteArrayOutputStream();
+            while ((index = input.read(bcache)) > 0) {
+                infoStream.write(bcache, 0, index);
+            }
+            return infoStream.toString("UTF-8");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        byte[] bcache = new byte[4096];
-        int index;
-        ByteArrayOutputStream infoStream = new ByteArrayOutputStream();
-        while ((index = input.read(bcache)) > 0) {
-            infoStream.write(bcache, 0, index);
-        }
-        return infoStream.toString("UTF-8");
     }
 
 
@@ -101,12 +102,21 @@ public class Common {
         return StringUtils.isEmpty(bucketName);
     }
 
-    public static Map<String, Object> parseXml(String bodyStr, Class<?> clazz) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-        return XmlUtil.DeserializeXml(bodyStr, clazz);
+    public static Map<String, Object> parseXml(String bodyStr, Class<?> clazz) {
+        try {
+            return XmlUtil.DeserializeXml(bodyStr, clazz);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public static Map<String, Object> getErrMessage(String bodyStr) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-        Map<String, Object> result = XmlUtil.DeserializeXml(bodyStr, ErrorResponse.class);
+    public static Map<String, Object> getErrMessage(String bodyStr) {
+        Map<String, Object> result = null;
+        try {
+            result = XmlUtil.DeserializeXml(bodyStr, ErrorResponse.class);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         result = result.get("Error") == null ? result : (Map<String, Object>) result.get("Error");
         return result;
     }
@@ -121,7 +131,7 @@ public class Common {
         return false;
     }
 
-    public static InputStream toForm(Map<String, ?> map, InputStream sourceFile, String boundary) throws Exception {
+    public static InputStream toForm(Map<String, ?> map, InputStream sourceFile, String boundary) {
         InputStream is;
         OutputStream os = new ByteArrayOutputStream();
         if (null == map) {
@@ -145,28 +155,32 @@ public class Common {
                 stringBuilder.append(entry.getValue()).append("\r\n");
             }
         }
-        if (null != file) {
-            Map<String, Object> headerFile = ((TeaModel) file).toMap();
-            stringBuilder.append("--").append(boundary).append("\r\n");
-            stringBuilder.append("Content-Disposition: form-data; name=\"file\"; filename=\"").append(headerFile.get("filename")).append("\"\r\n");
-            stringBuilder.append("Content-Type: ").append(headerFile.get("content-type")).append("\r\n\r\n");
-            os.write(stringBuilder.toString().getBytes("UTF-8"));
-            int index;
-            byte[] bufferOut = new byte[4096];
-            while ((index = sourceFile.read(bufferOut)) != -1) {
-                os.write(bufferOut, 0, index);
+        try {
+            if (null != file) {
+                Map<String, Object> headerFile = ((TeaModel) file).toMap();
+                stringBuilder.append("--").append(boundary).append("\r\n");
+                stringBuilder.append("Content-Disposition: form-data; name=\"file\"; filename=\"").append(headerFile.get("filename")).append("\"\r\n");
+                stringBuilder.append("Content-Type: ").append(headerFile.get("content-type")).append("\r\n\r\n");
+                os.write(stringBuilder.toString().getBytes("UTF-8"));
+                int index;
+                byte[] bufferOut = new byte[4096];
+                while ((index = sourceFile.read(bufferOut)) != -1) {
+                    os.write(bufferOut, 0, index);
+                }
+                sourceFile.close();
+                os.write("\r\n".getBytes("UTF-8"));
+            } else {
+                os.write(stringBuilder.toString().getBytes("UTF-8"));
             }
-            sourceFile.close();
-            os.write("\r\n".getBytes("UTF-8"));
-        } else {
-            os.write(stringBuilder.toString().getBytes("UTF-8"));
+            byte[] endData = ("--" + boundary + "--\r\n").getBytes();
+            os.write(endData);
+            os.flush();
+            byte[] bytes = ((ByteArrayOutputStream) os).toByteArray();
+            is = new ByteArrayInputStream(bytes);
+            return is;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        byte[] endData = ("--" + boundary + "--\r\n").getBytes();
-        os.write(endData);
-        os.flush();
-        byte[] bytes = ((ByteArrayOutputStream) os).toByteArray();
-        is = new ByteArrayInputStream(bytes);
-        return is;
     }
 
     public static String getDate() {
@@ -220,13 +234,17 @@ public class Common {
         return defaultUserAgent + " " + a;
     }
 
-    public static String getSignature(TeaRequest request, String secret) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
+    public static String getSignature(TeaRequest request, String secret) {
         return getSignature(request.query, request.method, secret);
     }
 
-    public static String percentEncode(String value) throws UnsupportedEncodingException {
-        return value != null ? URLEncoder.encode(value, URL_ENCODING).replace("+", "%20")
-                .replace("*", "%2A").replace("%7E", "~") : null;
+    public static String percentEncode(String value) {
+        try {
+            return value != null ? URLEncoder.encode(value, URL_ENCODING).replace("+", "%20")
+                    .replace("*", "%2A").replace("%7E", "~") : null;
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static String getHost(String str, String regionId, String _endpoint) {
@@ -238,9 +256,14 @@ public class Common {
         }
     }
 
-    public static Map<String, Object> json(TeaResponse response) throws IOException {
+    public static Map<String, Object> json(TeaResponse response) {
         Gson gson = new Gson();
-        Map<String, Object> map = gson.fromJson(response.getResponseBody(), Map.class);
+        Map<String, Object> map = null;
+        try {
+            map = gson.fromJson(response.getResponseBody(), Map.class);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         return map;
     }
 
@@ -260,28 +283,33 @@ public class Common {
         }
     }
 
-    public static void convert(TeaModel source, TeaModel target) throws IllegalAccessException, InstantiationException {
+    public static void convert(TeaModel source, TeaModel target) {
         if (source == null || target == null) {
             return;
         }
-        Class sourceClass = source.getClass();
-        Class targetClass = target.getClass();
-        Field[] fields = sourceClass.getDeclaredFields();
-        TeaModel teaModel = (TeaModel) sourceClass.newInstance();
-        for (Field field : fields) {
-            field.setAccessible(true);
-            if (InputStream.class.isAssignableFrom(field.getType())) {
-                continue;
+        try {
+
+            Class sourceClass = source.getClass();
+            Class targetClass = target.getClass();
+            Field[] fields = sourceClass.getDeclaredFields();
+            TeaModel teaModel = (TeaModel) sourceClass.newInstance();
+            for (Field field : fields) {
+                field.setAccessible(true);
+                if (InputStream.class.isAssignableFrom(field.getType())) {
+                    continue;
+                }
+                field.set(teaModel, field.get(source));
             }
-            field.set(teaModel, field.get(source));
-        }
-        Gson gson = new Gson();
-        String jsonString = gson.toJson(teaModel);
-        Object outPut = gson.fromJson(jsonString, targetClass);
-        fields = outPut.getClass().getFields();
-        for (Field field : fields) {
-            field.setAccessible(true);
-            field.set(target, field.get(outPut));
+            Gson gson = new Gson();
+            String jsonString = gson.toJson(teaModel);
+            Object outPut = gson.fromJson(jsonString, targetClass);
+            fields = outPut.getClass().getFields();
+            for (Field field : fields) {
+                field.setAccessible(true);
+                field.set(target, field.get(outPut));
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -305,12 +333,11 @@ public class Common {
         }
     }
 
-    public static String getSignatureV1(java.util.Map<String, String> signedParams, String method, String secret) throws Exception {
+    public static String getSignatureV1(java.util.Map<String, String> signedParams, String method, String secret) {
         return getSignature(signedParams, method, secret);
     }
 
-    private static String getSignature(java.util.Map<String, String> signedParams, String method, String secret) throws
-            UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
+    private static String getSignature(java.util.Map<String, String> signedParams, String method, String secret) {
         Map<String, String> queries = signedParams;
         String[] sortedKeys = queries.keySet().toArray(new String[]{});
         Arrays.sort(sortedKeys);
@@ -331,9 +358,13 @@ public class Common {
         stringToSign.append(SEPARATOR);
         stringToSign.append(percentEncode(
                 canonicalizedQueryString.toString().substring(1)));
-        Mac mac = Mac.getInstance(ALGORITHM_NAME);
-        mac.init(new SecretKeySpec((secret + SEPARATOR).getBytes(URL_ENCODING), ALGORITHM_NAME));
-        byte[] signData = mac.doFinal(stringToSign.toString().getBytes(URL_ENCODING));
-        return DatatypeConverter.printBase64Binary(signData);
+        try {
+            Mac mac = Mac.getInstance(ALGORITHM_NAME);
+            mac.init(new SecretKeySpec((secret + SEPARATOR).getBytes(URL_ENCODING), ALGORITHM_NAME));
+            byte[] signData = mac.doFinal(stringToSign.toString().getBytes(URL_ENCODING));
+            return DatatypeConverter.printBase64Binary(signData);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

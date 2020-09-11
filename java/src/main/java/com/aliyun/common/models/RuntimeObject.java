@@ -48,9 +48,12 @@ public class RuntimeObject extends TeaModel {
     @Validation(required = true)
     public Integer maxIdleConns;
 
-    public static RuntimeObject build(java.util.Map<String, ?> map) throws Exception {
+    public static RuntimeObject build(java.util.Map<String, ?> map) {
         RuntimeObject self = new RuntimeObject();
-        return TeaModel.build(map, self);
+        try {
+            return TeaModel.build(map, self);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
-
 }
