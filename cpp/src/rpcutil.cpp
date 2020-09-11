@@ -192,39 +192,69 @@ void Alibabacloud_RPCUtil::Client::convert(Model& body, Model& content) {
   }
 }
 
-map<string, string>
-Alibabacloud_RPCUtil::Client::query(const map<string, boost::any> &filter) {
-  map<string, string> query;
-  for (const auto &it : filter) {
-    boost::any val = it.second;
-    if (typeid(string) == val.type()) {
-      std::string v = boost::any_cast<string>(val);
-      query[it.first] = v;
-    } else if (typeid(int) == val.type()) {
-      int v = boost::any_cast<int>(val);
-      query[it.first] = std::to_string(v);
-    } else if (typeid(long) == val.type()) {
-      long v = boost::any_cast<long>(val);
-      query[it.first] = std::to_string(v);
-    } else if (typeid(double) == val.type()) {
-      auto v = boost::any_cast<double>(val);
-      query[it.first] = std::to_string(v);
-    } else if (typeid(float) == val.type()) {
-      auto v = boost::any_cast<float>(val);
-      query[it.first] = std::to_string(v);
-    } else if (typeid(bool) == val.type()) {
-      auto b = boost::any_cast<bool>(val);
-      string c = b ? "true" : "false";
-      query[it.first] = c;
-    } else if (typeid(const char *) == val.type()) {
-      const char *v = boost::any_cast<const char *>(val);
-      query[it.first] = v;
-    } else if (typeid(char *) == val.type()) {
-      char *v = boost::any_cast<char *>(val);
-      query[it.first] = v;
+
+void flatten(map<string, string> &res, std::string prefix,
+             boost::any curr) {
+  if (typeid(map<string, boost::any>) == curr.type()) {
+    map<string, boost::any> m = boost::any_cast<map<string, boost::any>>(curr);
+    for (const auto &it : m) {
+      std::string p;
+      if (prefix.empty()) {
+        p = prefix + it.first;
+      } else {
+        p = prefix + "." + it.first;
+      }
+      flatten(res, p, it.second);
+    }
+  } else if (typeid(vector<boost::any>) == curr.type()) {
+    vector<boost::any> v = boost::any_cast<vector<boost::any>>(curr);
+    int n = 0;
+    for (const auto &it : v) {
+      std::string p;
+      if (prefix.empty()) {
+        p = prefix + to_string(n+1);
+      } else {
+        p = prefix + "." + to_string(n+1);
+      }
+      flatten(res, p, it);
+      n++;
+
+    }
+  } else {
+    if (typeid(string) == curr.type()) {
+      std::string v = boost::any_cast<string>(curr);
+      res.insert(pair<string, string>(prefix, v));
+    } else if (typeid(int) == curr.type()) {
+      string v = std::to_string(boost::any_cast<int>(curr));
+      res.insert(pair<string, string>(prefix, v));
+    } else if (typeid(long) == curr.type()) {
+      string v = std::to_string(boost::any_cast<long>(curr));
+      res.insert(pair<string, string>(prefix, v));
+    } else if (typeid(double) == curr.type()) {
+      string v = std::to_string(boost::any_cast<double>(curr));
+      res.insert(pair<string, string>(prefix, v));
+    } else if (typeid(float) == curr.type()) {
+      string v = std::to_string(boost::any_cast<float>(curr));
+      res.insert(pair<string, string>(prefix, v));
+    } else if (typeid(bool) == curr.type()) {
+      auto b = boost::any_cast<bool>(curr);
+      string v = b ? "true" : "false";
+      res.insert(pair<string, string>(prefix, v));
+    } else if (typeid(const char *) == curr.type()) {
+      const char *v = boost::any_cast<const char *>(curr);
+      res.insert(pair<string, string>(prefix, v));
+    } else if (typeid(char *) == curr.type()) {
+      char *v = boost::any_cast<char *>(curr);
+      res.insert(pair<string, string>(prefix, v));
     }
   }
-  return query;
+}
+
+map<string, string>
+Alibabacloud_RPCUtil::Client::query(map<string, boost::any> filter) {
+  map<string, string> flat;
+  flatten(flat, string(""), boost::any(filter));
+  return flat;
 }
 
 string Alibabacloud_RPCUtil::Client::getOpenPlatFormEndpoint(string endpoint,

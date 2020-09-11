@@ -24,7 +24,7 @@ public:
   static bool hasError(map<string, boost::any> obj);
   static string getTimestamp();
   static void convert(Model& body, Model& content);
-  static map<string, string> query(const map<string, boost::any> &filter);
+  static map<string, string> query(map<string, boost::any> filter);
   static string getOpenPlatFormEndpoint(string endpoint, string regionId);
 };
 } // namespace Alibabacloud_RPCUtil
