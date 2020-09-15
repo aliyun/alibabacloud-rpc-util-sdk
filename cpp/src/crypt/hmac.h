@@ -1,5 +1,8 @@
-#ifndef ALIBABACLOUD_RPCUTIL_SRC_HMAC_H
-#define ALIBABACLOUD_RPCUTIL_SRC_HMAC_H
+/**
+ * reference from : https://github.com/lyokato/cpp-cryptlite
+ */
+#ifndef CSUGAR_SRC_CRYPT_HMAC_H
+#define CSUGAR_SRC_CRYPT_HMAC_H
 
 #include <string>
 #include <sstream>
@@ -141,4 +144,4 @@ private:
   T hasher_;
 }; // end of class
 
-#endif //ALIBABACLOUD_RPCUTIL_SRC_HMAC_H
+#endif //CSUGAR_SRC_CRYPT_HMAC_H

@@ -1,5 +1,9 @@
-#ifndef ALIBABACLOUD_RPCUTIL_SRC_SHA256_H
-#define ALIBABACLOUD_RPCUTIL_SRC_SHA256_H
+/**
+ * reference from : https://github.com/lyokato/cpp-cryptlite
+ */
+#ifndef CSUGAR_SRC_CRYPT_SHA256_H
+#define CSUGAR_SRC_CRYPT_SHA256_H
+
 #include <string>
 #include <cassert>
 #include <sstream>
@@ -1035,4 +1039,4 @@ private:
   }
 }; // end of class
 
-#endif //ALIBABACLOUD_RPCUTIL_SRC_SHA256_H
+#endif //CSUGAR_SRC_CRYPT_SHA256_H

@@ -1,5 +1,10 @@
 jobs:
   include:
+    # - language: cpp
+    #   compiler: gcc
+    #   dist: bionic
+    #   sudo: required
+    #   env: TEA_UTIL_ENV="cpp" CPLUS_INCLUDE_PATH="/usr/local/include/:/usr/include/jsoncpp/:/usr/lib/"
     - language: csharp
       mono: none
       dist: xenial

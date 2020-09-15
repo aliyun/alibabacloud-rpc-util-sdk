@@ -10,17 +10,22 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 message("C++ compiler flags: ${CMAKE_CXX_FLAGS}")
 
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+
 option(ENABLE_UNIT_TESTS "Enable unit tests" OFF)
 message(STATUS "Enable testing: ${ENABLE_UNIT_TESTS}")
+
+OPTION(ENABLE_COVERAGE "Use gcov" OFF)
+message(STATUS "Enable coverage: ${ENABLE_COVERAGE}")
+if (ENABLE_COVERAGE AND CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    set(CMAKE_BUILD_TYPE "Coverage")
+    include(CodeCoverage)
+    setup_target_for_coverage(${PROJECT_NAME}_coverage ${PROJECT_NAME}_test coverage)
+endif ()
 
 if (CMAKE_CXX_COMPILER_LOADED)
     message(STATUS "The C++ compiler ID is: ${CMAKE_CXX_COMPILER_ID}")
     message(STATUS "The C++ compiler version is: ${CMAKE_CXX_COMPILER_VERSION}")
-endif ()
-
-list(APPEND flags "-fPIC" "-Wall" "-Wno-dev")
-if (NOT WIN32)
-    list(APPEND flags "-Wextra" "-Wpedantic")
 endif ()
 
 if (NOT CMAKE_BUILD_TYPE)
@@ -52,26 +57,26 @@ set_target_properties(${PROJECT_NAME}
         MACOSX_RPATH ON
         WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
-add_subdirectory(external/libraries)
-target_link_libraries(${PROJECT_NAME} PRIVATE )
+add_subdirectory(external)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE darabonba_core)
 
 if (ENABLE_UNIT_TESTS)
     include(CTest)
     enable_testing()
-    add_subdirectory(external/libraries_dev)
-    add_executable(tests
+    add_executable(tests_alibabacloud_rpcutil
             tests/main.cpp)
-    target_include_directories(tests
+    target_include_directories(tests_alibabacloud_rpcutil
             PRIVATE
             ${CMAKE_CURRENT_SOURCE_DIR}/include)
-    target_link_libraries(tests
+    target_link_libraries(tests_alibabacloud_rpcutil
             PRIVATE
             ${PROJECT_NAME}
             gtest_main
             gmock_main
             darabonba_core)
     add_test(NAME google_test
-            COMMAND $<TARGET_FILE:tests>)
+            COMMAND $<TARGET_FILE:tests_alibabacloud_rpcutil>)
 endif ()
 
 message(STATUS "Project will be installed to ${CMAKE_INSTALL_PREFIX}")

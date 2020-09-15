@@ -28,6 +28,7 @@
 		"clientName": "client"
 	},
 	"cpp": {
+		"withTest": 1,
 		"packageInfo": {
 			"git": {
 				"scope": "alibabacloud-sdk-cpp",
