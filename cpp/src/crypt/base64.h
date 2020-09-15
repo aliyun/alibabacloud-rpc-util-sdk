@@ -1,5 +1,8 @@
-#ifndef ALIBABACLOUD_RPCUTIL_SRC_BASE64_H
-#define ALIBABACLOUD_RPCUTIL_SRC_BASE64_H
+/**
+ * reference from : https://github.com/lyokato/cpp-cryptlite
+ */
+#ifndef CSUGAR_SRC_CRYPT_BASE64_H
+#define CSUGAR_SRC_CRYPT_BASE64_H
 
 #include <string>
 #include <sstream>
@@ -14,14 +17,12 @@ class base64 : public boost::noncopyable {
 public:
 
   static std::string
-  encode_from_string(const std::string& s)
-  {
-    return encode_from_array(reinterpret_cast<const boost::uint8_t*>(s.c_str()), s.size());
+  encode_from_string(const std::string &s) {
+    return encode_from_array(reinterpret_cast<const boost::uint8_t *>(s.c_str()), s.size());
   }
 
   static std::string
-  encode_from_array(const boost::uint8_t* s, unsigned int size)
-  {
+  encode_from_array(const boost::uint8_t *s, unsigned int size) {
     std::ostringstream os;
     boost::uint8_t c1, c2, c3;
     unsigned int i = 0;
@@ -37,7 +38,7 @@ public:
       c2 = s[i++];
       if (i == size) {
         os << enctable[c1 >> 2];
-        os << enctable[((c1 & 0x3) << 4)|((c2 & 0xf0) >> 4)];
+        os << enctable[((c1 & 0x3) << 4) | ((c2 & 0xf0) >> 4)];
         os << enctable[(c2 & 0xf) << 2];
         os << '=';
         break;
@@ -52,8 +53,7 @@ public:
   }
 
   static boost::tuple<boost::shared_array<boost::uint8_t>, std::size_t>
-  decode_to_array(const std::string& s)
-  {
+  decode_to_array(const std::string &s) {
     char c1, c2, c3, c4;
     unsigned int size = static_cast<unsigned int>(s.size());
     unsigned int i = 0;
@@ -68,8 +68,9 @@ public:
       do {
         c1 = dectable[s[i++] & 0xff];
       } while (i < size && c1 == -1);
-      if (c1 == -1)
+      if (c1 == -1) {
         break;
+      }
 
       do {
         c2 = dectable[s[i++] & 0xff];
@@ -77,7 +78,11 @@ public:
       if (c2 == -1)
         break;
 
-      dest[dest_len++] = static_cast<boost::uint8_t>(((c1 << 2)|((c2 & 0x30) >> 4) & 0xff));
+      char d1 = c1 << 2;
+      char d2 = c2 & 0x30;
+      char d3 = d2 >> 4;
+      char d4 = d1 | d3;
+      dest[dest_len++] = static_cast<boost::uint8_t>(d4 & 0xff);
 
       do {
         c3 = s[i++] & 0xff;
@@ -88,7 +93,11 @@ public:
       if (c3 == -1)
         break;
 
-      dest[dest_len++] = static_cast<boost::uint8_t>((((c2 & 0xf) << 4)|((c3 & 0x3c) >> 2) & 0xff));
+      d2 = c2 & 0xf << 4;
+      d3 = c3 & 0x3c;
+      d4 = (d3) >> 2;
+      char d5 = d2 | d4;
+      dest[dest_len++] = static_cast<boost::uint8_t>(d5 & 0xff);
 
       do {
         c4 = s[i++] & 0xff;
@@ -99,18 +108,21 @@ public:
       if (c4 == -1)
         break;
 
-      dest[dest_len++] = static_cast<boost::uint8_t>((((c3 & 0x03) << 6)| c4) & 0xff);
+      d1 = c3 & 0x03;
+      d2 = d1 << 6;
+      d3 = d2 | c4;
+
+      dest[dest_len++] = static_cast<boost::uint8_t>(d3 & 0xff);
     }
     return boost::make_tuple(dest, dest_len);
   }
 
-  template <typename T>
+  template<typename T>
   static void
-  decode(const std::string& s, T& dest)
-  {
+  decode(const std::string &s, T &dest) {
     char c1, c2, c3, c4;
     std::size_t size = s.size();
-    int i= 0;
+    int i = 0;
     float dest_guide_size = static_cast<float>(size * 3) / 4;
 
     dest.clear();
@@ -138,7 +150,11 @@ public:
       if (c2 == -1)
         break;
 
-      dest.push_back(static_cast<boost::uint8_t>(((c1 << 2)|((c2 & 0x30) >> 4) & 0xff)));
+      char d1 = c1 << 2;
+      char d2 = c2 & 0x30;
+      char d3 = d2 >> 4;
+      char d4 = d1 | d3;
+      dest.push_back(static_cast<boost::uint8_t>(d4 & 0xff));
 
       do {
         c3 = s[i++] & 0xff;
@@ -149,7 +165,12 @@ public:
       if (c3 == -1)
         break;
 
-      dest.push_back(static_cast<boost::uint8_t>((((c2 & 0xf) << 4)|((c3 & 0x3c) >> 2) & 0xff)));
+      d1 = c2 & 0xf;
+      d2 = d1 << 4;
+      d3 = c3 & 0x3c;
+      d4 = d3 >> 2;
+      char d5 = d2 | d4;
+      dest.push_back(static_cast<boost::uint8_t>(d5 & 0xff));
 
       do {
         c4 = s[i++] & 0xff;
@@ -160,7 +181,7 @@ public:
       if (c4 == -1)
         break;
 
-      dest.push_back(static_cast<boost::uint8_t>((((c3 & 0x03) << 6)| c4) & 0xff));
+      dest.push_back(static_cast<boost::uint8_t>((((c3 & 0x03) << 6) | c4) & 0xff));
     }
   }
 
@@ -176,10 +197,10 @@ const char base64::dectable[128] = {
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 62, -1, -1, -1, 63,
     52, 53, 54, 55, 56, 57, 58, 59, 60, 61, -1, -1, -1, -1, -1, -1,
-    -1,  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14,
+    -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,
     15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, -1, -1, -1, -1, -1,
     -1, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
     41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, -1, -1, -1, -1, -1
 };
 
-#endif //ALIBABACLOUD_RPCUTIL_SRC_BASE64_H
+#endif //CSUGAR_SRC_CRYPT_BASE64_H

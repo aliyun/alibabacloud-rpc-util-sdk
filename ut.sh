@@ -9,6 +9,18 @@ function upload_codecov_report {
   return $?
 }
 
+function run_cpp {
+  cd cpp/ || return 126
+  sudo add-apt-repository ppa:mhier/libboost-latest -y || return 126
+  sudo apt-get update || return 126
+  aptitude search boost || return 126
+  sudo apt-get install libboost-all-dev || return 126
+  sudo apt-get install lcov libcpprest-dev libcurl4-openssl-dev libssl-dev uuid-dev libjson-c-dev libjsoncpp-dev || return 126
+  sh scripts/codecov.sh || return 126
+  cd ../
+  upload_codecov_report cpp cpp
+}
+
 function run_php {
   cd php/ || return 126
   composer --version
@@ -132,6 +144,10 @@ elif [ "$lang" == "python" ]
 then
   echo "run python"
   run_python
+elif [ "$lang" == "cpp" ]
+then
+  echo "run cpp"
+  run_cpp
 fi
 
 exit $?
