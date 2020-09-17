@@ -15,6 +15,7 @@ English | [简体中文](README-CN.md)
 - [RPC Util SDK for TypeScript/Node.js](./ts/README.md)
 - [RPC Util SDK for Swift](./swift/README.md)
 - [RPC Util SDK for PHP](./php/README.md)
+- [RPC Util SDK for C++](./cpp/README.md)
 
 ## Issues
 

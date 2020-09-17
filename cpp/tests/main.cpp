@@ -24,26 +24,26 @@ TEST(tests, getEndpoint) {
   bool *serverUse = new bool(false);
   auto *endpointType = new string("public");
   ASSERT_EQ(string("ecs.cn-hangzhou.aliyuncs.com"),
-            *Alibabacloud_RPCUtil::Client::getEndpoint(endpoint, serverUse, endpointType));
+            Alibabacloud_RPCUtil::Client::getEndpoint(endpoint, serverUse, endpointType));
   *endpointType = "internal";
   ASSERT_EQ(string("ecs-internal.cn-hangzhou.aliyuncs.com"),
-            *Alibabacloud_RPCUtil::Client::getEndpoint(endpoint, serverUse, endpointType));
+            Alibabacloud_RPCUtil::Client::getEndpoint(endpoint, serverUse, endpointType));
   *serverUse = true;
   *endpointType = "accelerate";
   ASSERT_EQ(string("oss-accelerate.aliyuncs.com"),
-            *Alibabacloud_RPCUtil::Client::getEndpoint(endpoint, serverUse, endpointType));
+            Alibabacloud_RPCUtil::Client::getEndpoint(endpoint, serverUse, endpointType));
 }
 
 TEST(tests, getHost) {
   string *productId = nullptr;
   string *regionId = nullptr;
   auto *endpoint = new string("testEndpoint");
-  ASSERT_EQ(*endpoint, *Client::getHost(productId, regionId, endpoint));
+  ASSERT_EQ(*endpoint, Client::getHost(productId, regionId, endpoint));
 
   productId = new string("CC_CN");
   regionId = new string("CN-Hangzhou");
   *endpoint = "";
-  ASSERT_EQ(string("cc.cn-hangzhou.aliyuncs.com"), *Client::getHost(productId, regionId, endpoint));
+  ASSERT_EQ(string("cc.cn-hangzhou.aliyuncs.com"), Client::getHost(productId, regionId, endpoint));
 }
 
 TEST(tests, getSignature) {
@@ -54,7 +54,7 @@ TEST(tests, getSignature) {
   };
   TeaRequest->query = query;
   auto *secret = new string("secret");
-  ASSERT_EQ(string("XlUyV4sXjOuX5FnjUz9IF9tm5rU="), *Client::getSignature(TeaRequest, secret));
+  ASSERT_EQ(string("XlUyV4sXjOuX5FnjUz9IF9tm5rU="), Client::getSignature(TeaRequest, secret));
 }
 
 TEST(tests, getSignatureV1) {
@@ -64,22 +64,22 @@ TEST(tests, getSignatureV1) {
                                         });
   auto *method = new string("GET");
   auto *secret = new string("secret");
-  ASSERT_EQ(string("XlUyV4sXjOuX5FnjUz9IF9tm5rU="), *Client::getSignatureV1(query, method, secret));
+  ASSERT_EQ(string("XlUyV4sXjOuX5FnjUz9IF9tm5rU="), Client::getSignatureV1(query, method, secret));
 }
 
 TEST(tests, hasError) {
   map<string, boost::any> *m = nullptr;
-  ASSERT_TRUE(*Client::hasError(m));
+  ASSERT_TRUE(Client::hasError(m));
 
   m = new map<string, boost::any>();
-  ASSERT_FALSE(*Client::hasError(m));
+  ASSERT_FALSE(Client::hasError(m));
 
   auto *m1 = new map<string, boost::any>({{"Code", "a"}});
-  ASSERT_TRUE(*Client::hasError(m1));
+  ASSERT_TRUE(Client::hasError(m1));
 }
 
 TEST(tests, getTimestamp) {
-  ASSERT_EQ(20, Client::getTimestamp()->size());
+  ASSERT_EQ(20, Client::getTimestamp().size());
 }
 
 TEST(tests, convert) {
@@ -101,9 +101,9 @@ TEST(tests, query) {
                                             {"str_test", "test"},
                                             {"int_test", 1}
                                         });
-  map<string, string> *result = Client::query(m);
-  ASSERT_EQ("test", result->at("str_test"));
-  ASSERT_EQ("1", result->at("int_test"));
+  map<string, string> result = Client::query(m);
+  ASSERT_EQ("test", result.at("str_test"));
+  ASSERT_EQ("1", result.at("int_test"));
 
   vector<boost::any> sl = {1, 2};
   map<string, boost::any> sub_map_fd = {
@@ -117,15 +117,14 @@ TEST(tests, query) {
                                              {"str_test", "test"}
                                          });
 
-  map<string, string> *res = Client::query(fd);
-  ASSERT_EQ("1", res->at("first_map_list.1"));
-  ASSERT_EQ("2", res->at("first_map_list.2"));
-  ASSERT_EQ("2", res->at("first_map_map.int_test"));
-  ASSERT_EQ("test", res->at("first_map_map.str_test"));
-  ASSERT_EQ("2", res->at("int_test"));
-  ASSERT_EQ("test", res->at("str_test"));
+  map<string, string> res = Client::query(fd);
+  ASSERT_EQ("1", res.at("first_map_list.1"));
+  ASSERT_EQ("2", res.at("first_map_list.2"));
+  ASSERT_EQ("2", res.at("first_map_map.int_test"));
+  ASSERT_EQ("test", res.at("first_map_map.str_test"));
+  ASSERT_EQ("2", res.at("int_test"));
+  ASSERT_EQ("test", res.at("str_test"));
 
-  delete res;
   delete fd;
 }
 
@@ -134,16 +133,16 @@ TEST(tests, getOpenPlatFormEndpoint) {
   auto *region_id = new string("");
   ASSERT_EQ(
       string("openplatform.aliyuncs.com"),
-      *Client::getOpenPlatFormEndpoint(endpoint, region_id)
+      Client::getOpenPlatFormEndpoint(endpoint, region_id)
   );
   *region_id = "cn-hangzhou";
   ASSERT_EQ(
       string("openplatform.aliyuncs.com"),
-      *Client::getOpenPlatFormEndpoint(endpoint, region_id)
+      Client::getOpenPlatFormEndpoint(endpoint, region_id)
   );
   *region_id = "ap-northeast-1";
   ASSERT_EQ(
       string("openplatform.ap-northeast-1.aliyuncs.com"),
-      *Client::getOpenPlatFormEndpoint(endpoint, region_id)
+      Client::getOpenPlatFormEndpoint(endpoint, region_id)
   );
 }

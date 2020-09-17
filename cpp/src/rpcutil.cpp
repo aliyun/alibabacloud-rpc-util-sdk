@@ -47,11 +47,16 @@ std::string implode(const std::vector<std::string> &vec,
   return res;
 }
 
-string *Alibabacloud_RPCUtil::Client::getEndpoint(string *endpoint,
-                                                  bool *serverUse,
-                                                  string *endpointType) {
+string Alibabacloud_RPCUtil::Client::getEndpoint(string *endpoint,
+                                                 bool *serverUse,
+                                                 string *endpointType) {
   string e = nullptr == endpoint ? "" : *endpoint;
-  bool s = nullptr == serverUse ? false : *serverUse;
+  bool s;
+  if (nullptr == serverUse) {
+    s = false;
+  } else {
+    s = *serverUse;
+  }
   string et = nullptr == endpointType ? "" : *endpointType;
   if (et == string("internal")) {
     std::vector<std::string> tmp = explode(e, ".");
@@ -62,11 +67,9 @@ string *Alibabacloud_RPCUtil::Client::getEndpoint(string *endpoint,
     e = "oss-accelerate.aliyuncs.com";
   }
   if (endpoint == nullptr) {
-    return new string(e);
-  } else {
-    *endpoint = e;
+    return e;
   }
-  return endpoint;
+  return e;
 }
 
 string lowercase(string str) {
@@ -81,18 +84,18 @@ string uppercase(string str) {
   return str;
 }
 
-string *Alibabacloud_RPCUtil::Client::getHost(string *productId,
-                                              string *regionId,
-                                              string *endpoint) {
+string Alibabacloud_RPCUtil::Client::getHost(string *productId,
+                                             string *regionId,
+                                             string *endpoint) {
   string p = nullptr == productId ? "" : *productId;
   string r = nullptr == regionId ? "" : *regionId;
   string e = nullptr == endpoint ? "" : *endpoint;
   p = p.substr(0, p.find('_'));
   if (e.empty()) {
-    endpoint = new string(lowercase(std::move(p)) + "." +
-        lowercase(std::move(r)) + ".aliyuncs.com");
+    e = lowercase(std::move(p)) + "." + lowercase(std::move(r)) +
+        ".aliyuncs.com";
   }
-  return endpoint;
+  return e;
 }
 
 string url_encode(const std::string &str) {
@@ -106,7 +109,7 @@ string url_encode(const std::string &str) {
       continue;
     }
     escaped << std::uppercase;
-    escaped << '%' << std::setw(2) << int((unsigned char) c);
+    escaped << '%' << std::setw(2) << int((unsigned char)c);
     escaped << nouppercase;
   }
 
@@ -118,8 +121,8 @@ std::string strToSign(std::string method, const map<string, string> &query) {
   for (const auto &it : query) {
     std::string s;
     s = s.append(url_encode(it.first))
-        .append("=")
-        .append(url_encode(it.second));
+            .append("=")
+            .append(url_encode(it.second));
     tmp.push_back(s);
   }
   std::string str = implode(tmp, "&");
@@ -129,8 +132,8 @@ std::string strToSign(std::string method, const map<string, string> &query) {
       .append(url_encode(str));
 }
 
-string *Alibabacloud_RPCUtil::Client::getSignature(Request *request,
-                                                   string *secret) {
+string Alibabacloud_RPCUtil::Client::getSignature(Request *request,
+                                                  string *secret) {
   Request r = nullptr == request ? Request() : *request;
   std::string s = nullptr == secret ? "" : *secret;
 
@@ -143,15 +146,15 @@ string *Alibabacloud_RPCUtil::Client::getSignature(Request *request,
   if (sign_method == "HMAC-SHA1") {
     boost::uint8_t hash_val[sha1::HASH_SIZE];
     hmac<sha1>::calc(str, s, hash_val);
-    return new string(base64::encode_from_array(hash_val, sha1::HASH_SIZE));
+    return base64::encode_from_array(hash_val, sha1::HASH_SIZE);
   } else {
     boost::uint8_t hash_val[sha1::HASH_SIZE];
     hmac<sha256>::calc(str, s, hash_val);
-    return new string(base64::encode_from_array(hash_val, sha1::HASH_SIZE));
+    return base64::encode_from_array(hash_val, sha1::HASH_SIZE);
   }
 }
 
-string *
+string
 Alibabacloud_RPCUtil::Client::getSignatureV1(map<string, string> *signedParams,
                                              string *method, string *secret) {
   map<string, string> sp;
@@ -167,51 +170,51 @@ Alibabacloud_RPCUtil::Client::getSignatureV1(map<string, string> *signedParams,
   s = s + "&";
   boost::uint8_t hash_val[sha1::HASH_SIZE];
   hmac<sha1>::calc(str, s, hash_val);
-  return new string(base64::encode_from_array(hash_val, sha1::HASH_SIZE));
+  return base64::encode_from_array(hash_val, sha1::HASH_SIZE);
 }
 
-bool *Alibabacloud_RPCUtil::Client::hasError(map<string, boost::any> *obj) {
+bool Alibabacloud_RPCUtil::Client::hasError(map<string, boost::any> *obj) {
   if (nullptr == obj) {
-    return new bool(true);
+    return true;
   }
   map<string, boost::any> o = *obj;
   if (o.empty()) {
-    return new bool(false);
+    return false;
   }
   if (o.find("Code") == o.end()) {
-    return new bool(false);
+    return false;
   }
   if (o.at("Code").type() == typeid(string)) {
     string r = boost::any_cast<string>(o.at("Code"));
     if (!r.empty() && r != "0") {
-      return new bool(true);
+      return true;
     }
   } else if (o.at("Code").type() == typeid(char *)) {
     char *r = boost::any_cast<char *>(o.at("Code"));
     if (std::strncmp(r, "", 1) != 0 && std::strncmp(r, "0", 1) != 0) {
-      return new bool(true);
+      return true;
     }
   } else if (o.at("Code").type() == typeid(const char *)) {
     const char *r = boost::any_cast<const char *>(o.at("Code"));
     if (std::strncmp(r, "", 1) != 0 && std::strncmp(r, "0", 1) != 0) {
-      return new bool(true);
+      return true;
     }
   } else if (o.at("Code").type() == typeid(int)) {
     int r = boost::any_cast<int>(o.at("Code"));
     if (r != 0) {
-      return new bool(true);
+      return true;
     }
   }
-  return new bool(false);
+  return false;
 }
 
-string *Alibabacloud_RPCUtil::Client::getTimestamp() {
+string Alibabacloud_RPCUtil::Client::getTimestamp() {
   auto now = std::chrono::system_clock::now();
   auto itt = std::chrono::system_clock::to_time_t(now);
 
   std::ostringstream ss;
   ss << std::put_time(gmtime(&itt), "%FT%TZ");
-  return new string(ss.str());
+  return ss.str();
 }
 
 void Alibabacloud_RPCUtil::Client::convert(Model *body, Model *content) {
@@ -276,33 +279,34 @@ void flatten(map<string, string> &res, std::string prefix, boost::any curr) {
   }
 }
 
-map<string, string> *
+map<string, string>
 Alibabacloud_RPCUtil::Client::query(map<string, boost::any> *filter) {
   map<string, string> flat;
   flatten(flat, string(""), boost::any(*filter));
-  auto *res = new map<string, string>();
+  map<string, string> res;
   for (auto it : flat) {
-    res->insert(pair<string, string>(it.first, it.second));
+    res.insert(pair<string, string>(it.first, it.second));
   }
   return res;
 }
 
-string *
-Alibabacloud_RPCUtil::Client::getOpenPlatFormEndpoint(string *endpoint,
-                                                      string *regionId) {
+string Alibabacloud_RPCUtil::Client::getOpenPlatFormEndpoint(string *endpoint,
+                                                             string *regionId) {
   std::vector<string> supportedRegionId = {"ap-southeast-1", "ap-northeast-1",
                                            "eu-central-1", "cn-hongkong",
                                            "ap-south-1"};
-  *regionId = lowercase(*regionId);
+  string region_id = nullptr == regionId ? "" : *regionId;
+  string e = nullptr == endpoint ? "" : *endpoint;
+  region_id = lowercase(region_id);
   if (!regionId->empty()) {
     bool exist = std::find(supportedRegionId.begin(), supportedRegionId.end(),
-                           *regionId) != supportedRegionId.end();
+                           region_id) != supportedRegionId.end();
 
     if (exist) {
-      vector<string> tmp = explode(*endpoint, ".");
-      tmp.at(0) = tmp.at(0).append(".").append(lowercase(*regionId));
-      return new string(implode(tmp, "."));
+      vector<string> tmp = explode(e, ".");
+      tmp.at(0) = tmp.at(0).append(".").append(lowercase(region_id));
+      return implode(tmp, ".");
     }
   }
-  return endpoint;
+  return e;
 }
