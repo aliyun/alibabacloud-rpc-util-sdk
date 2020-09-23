@@ -160,12 +160,10 @@ class RpcUtils
 
         $params = [];
         foreach ($query as $k => $v) {
-            if (!empty($v)) {
-                //对参数名称和参数值进行 URL 编码
-                $k = rawurlencode($k);
-                $v = rawurlencode($v);
-                //对编码后的参数名称和值使用英文等号（=）进行连接
-                array_push($params, $k . '=' . $v);
+            $str = rawurlencode($k);
+            if (null !== $v && '' !== $v) {
+                $str .= '=' . rawurlencode($v);
+                array_push($params, $str);
             }
         }
         $str = implode('&', $params);
