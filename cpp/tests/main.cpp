@@ -1,6 +1,8 @@
 #include "gtest/gtest.h"
+#include <memory>
 #include <alibabacloud/rpcutil.hpp>
 #include <darabonba/core.hpp>
+#include <boost/shared_ptr.hpp>
 #include <map>
 #include <utility>
 
@@ -12,17 +14,50 @@ int main(int argc, char **argv) {
   return RUN_ALL_TESTS();
 }
 
-class TestModel : public Darabonba::Model {
+class TestModel: public Model
+{
 public:
+  string getName() {
+    return name;
+  }
+
+  string getTest() {
+    return test;
+  }
+
+  void setName(string n) {
+    name = std::move(n);
+  }
+
+  void setTest(string t) {
+    test = std::move(t);
+  }
+
   void validate() override {
     cout << "test validate";
   }
+
+  map<string, boost::any> toMap() override{
+    map<string, boost::any> result;
+    result["name"] = name;
+    result["test"] = test;
+    return result;
+  };
+
+  void fromMap(map<string, boost::any> m) override{
+    name = boost::any_cast<string>(m.at("name"));
+    test = boost::any_cast<string>(m.at("test"));
+  }
+private:
+  string name;
+  string test;
 };
 
 TEST(tests, getEndpoint) {
-  auto *endpoint = new string("ecs.cn-hangzhou.aliyuncs.com");
-  bool *serverUse = new bool(false);
-  auto *endpointType = new string("public");
+  shared_ptr<string> endpoint(new string("ecs.cn-hangzhou.aliyuncs.com"));
+  shared_ptr<bool> serverUse(new bool(false));
+  shared_ptr<string> endpointType(new string("public"));
+
   ASSERT_EQ(string("ecs.cn-hangzhou.aliyuncs.com"),
             Alibabacloud_RPCUtil::Client::getEndpoint(endpoint, serverUse, endpointType));
   *endpointType = "internal";
@@ -35,47 +70,50 @@ TEST(tests, getEndpoint) {
 }
 
 TEST(tests, getHost) {
-  string *productId = nullptr;
-  string *regionId = nullptr;
-  auto *endpoint = new string("testEndpoint");
+  shared_ptr<string> productId;
+  shared_ptr<string> regionId;
+  shared_ptr<string> endpoint(new string("testEndpoint"));
   ASSERT_EQ(*endpoint, Client::getHost(productId, regionId, endpoint));
 
-  productId = new string("CC_CN");
-  regionId = new string("CN-Hangzhou");
+  productId = std::make_shared<string>("CC_CN");
+  regionId = std::make_shared<string>("CN-Hangzhou");
   *endpoint = "";
   ASSERT_EQ(string("cc.cn-hangzhou.aliyuncs.com"), Client::getHost(productId, regionId, endpoint));
 }
 
 TEST(tests, getSignature) {
-  auto *TeaRequest = new Request();
+  shared_ptr<string> secret(new string("secret"));
+  shared_ptr<Request> TeaRequest(new Request());
   map<string, string> query = {
       {"query", "test"},
       {"body", "test"}
   };
   TeaRequest->query = query;
-  auto *secret = new string("secret");
+
   ASSERT_EQ(string("XlUyV4sXjOuX5FnjUz9IF9tm5rU="), Client::getSignature(TeaRequest, secret));
 }
 
 TEST(tests, getSignatureV1) {
-  auto *query = new map<string, string>({
-                                            {"query", "test"},
-                                            {"body", "test"}
-                                        });
-  auto *method = new string("GET");
-  auto *secret = new string("secret");
+  shared_ptr<map<string, string>> query(new map<string, string>({
+                                                                    {"query", "test"},
+                                                                    {"body", "test"}
+                                                                }));
+
+  shared_ptr<string> method(new string("GET"));
+  shared_ptr<string> secret(new string("secret"));
   ASSERT_EQ(string("XlUyV4sXjOuX5FnjUz9IF9tm5rU="), Client::getSignatureV1(query, method, secret));
 }
 
 TEST(tests, hasError) {
-  map<string, boost::any> *m = nullptr;
+  shared_ptr<map<string, boost::any>> m;
   ASSERT_TRUE(Client::hasError(m));
 
-  m = new map<string, boost::any>();
+  m = std::make_shared<map<string, boost::any>>();
   ASSERT_FALSE(Client::hasError(m));
 
-  auto *m1 = new map<string, boost::any>({{"Code", "a"}});
-  ASSERT_TRUE(Client::hasError(m1));
+  ASSERT_TRUE(Client::hasError(
+      shared_ptr<map<string, boost::any>>(new map<string, boost::any>({{"Code", "a"}}))
+      ));
 }
 
 TEST(tests, getTimestamp) {
@@ -83,24 +121,24 @@ TEST(tests, getTimestamp) {
 }
 
 TEST(tests, convert) {
-  auto *iModel = new TestModel();
-  auto *oModel = new TestModel();
   string name = "name";
   string test = "test";
-  iModel->set("name", name);
-  iModel->set("test", test);
-  Client::convert(iModel, oModel);
-  ASSERT_EQ(name, boost::any_cast<string>(oModel->get("name")));
-  ASSERT_EQ(test, boost::any_cast<string>(oModel->get("test")));
-  delete iModel;
-  delete oModel;
+  shared_ptr<TestModel> iModel(new TestModel);
+  shared_ptr<TestModel> oModel(new TestModel);
+  iModel->setName(name);
+  iModel->setTest(test);
+  auto i_model = static_pointer_cast<Model>(iModel);
+  auto o_model = static_pointer_cast<Model>(oModel);
+  Alibabacloud_RPCUtil::Client::convert(i_model, o_model);
+  ASSERT_EQ(name, oModel->getName());
+  ASSERT_EQ(test, oModel->getTest());
 }
 
 TEST(tests, query) {
-  auto *m = new map<string, boost::any>({
-                                            {"str_test", "test"},
-                                            {"int_test", 1}
-                                        });
+  shared_ptr<map<string, boost::any>> m(new map<string, boost::any>({
+                                                                    {"str_test", "test"},
+                                                                    {"int_test", 1}
+                                                                }));
   map<string, string> result = Client::query(m);
   ASSERT_EQ("test", result.at("str_test"));
   ASSERT_EQ("1", result.at("int_test"));
@@ -110,12 +148,12 @@ TEST(tests, query) {
       {"int_test", 2},
       {"str_test", "test"}
   };
-  auto *fd = new map<string, boost::any>({
+  shared_ptr<map<string, boost::any>> fd(new map<string, boost::any>({
                                              {"first_map_map", sub_map_fd},
                                              {"first_map_list", sl},
                                              {"int_test", 2},
                                              {"str_test", "test"}
-                                         });
+                                         }));
 
   map<string, string> res = Client::query(fd);
   ASSERT_EQ("1", res.at("first_map_list.1"));
@@ -124,13 +162,11 @@ TEST(tests, query) {
   ASSERT_EQ("test", res.at("first_map_map.str_test"));
   ASSERT_EQ("2", res.at("int_test"));
   ASSERT_EQ("test", res.at("str_test"));
-
-  delete fd;
 }
 
 TEST(tests, getOpenPlatFormEndpoint) {
-  auto *endpoint = new string("openplatform.aliyuncs.com");
-  auto *region_id = new string("");
+  shared_ptr<string> endpoint(new string("openplatform.aliyuncs.com"));
+  shared_ptr<string> region_id(new string(""));
   ASSERT_EQ(
       string("openplatform.aliyuncs.com"),
       Client::getOpenPlatFormEndpoint(endpoint, region_id)

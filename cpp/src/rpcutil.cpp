@@ -47,17 +47,17 @@ std::string implode(const std::vector<std::string> &vec,
   return res;
 }
 
-string Alibabacloud_RPCUtil::Client::getEndpoint(string *endpoint,
-                                                 bool *serverUse,
-                                                 string *endpointType) {
-  string e = nullptr == endpoint ? "" : *endpoint;
+string Alibabacloud_RPCUtil::Client::getEndpoint(shared_ptr<string> endpoint,
+                                                 shared_ptr<bool> serverUse,
+                                                 shared_ptr<string> endpointType) {
+  string e = !endpoint ? "" : *endpoint;
   bool s;
-  if (nullptr == serverUse) {
+  if (!serverUse) {
     s = false;
   } else {
     s = *serverUse;
   }
-  string et = nullptr == endpointType ? "" : *endpointType;
+  string et = !endpointType ? "" : *endpointType;
   if (et == string("internal")) {
     std::vector<std::string> tmp = explode(e, ".");
     tmp.at(0) = tmp.at(0).append("-internal");
@@ -65,9 +65,6 @@ string Alibabacloud_RPCUtil::Client::getEndpoint(string *endpoint,
   }
   if (s && et == string("accelerate")) {
     e = "oss-accelerate.aliyuncs.com";
-  }
-  if (endpoint == nullptr) {
-    return e;
   }
   return e;
 }
@@ -84,12 +81,12 @@ string uppercase(string str) {
   return str;
 }
 
-string Alibabacloud_RPCUtil::Client::getHost(string *productId,
-                                             string *regionId,
-                                             string *endpoint) {
-  string p = nullptr == productId ? "" : *productId;
-  string r = nullptr == regionId ? "" : *regionId;
-  string e = nullptr == endpoint ? "" : *endpoint;
+string Alibabacloud_RPCUtil::Client::getHost(shared_ptr<string> productId,
+                                             shared_ptr<string> regionId,
+                                             shared_ptr<string> endpoint) {
+  string p = !productId ? "" : *productId;
+  string r = !regionId ? "" : *regionId;
+  string e = !endpoint ? "" : *endpoint;
   p = p.substr(0, p.find('_'));
   if (e.empty()) {
     e = lowercase(std::move(p)) + "." + lowercase(std::move(r)) +
@@ -132,10 +129,10 @@ std::string strToSign(std::string method, const map<string, string> &query) {
       .append(url_encode(str));
 }
 
-string Alibabacloud_RPCUtil::Client::getSignature(Request *request,
-                                                  string *secret) {
-  Request r = nullptr == request ? Request() : *request;
-  std::string s = nullptr == secret ? "" : *secret;
+string Alibabacloud_RPCUtil::Client::getSignature(shared_ptr<Request> request,
+                                                  shared_ptr<string> secret) {
+  Request r = !request ? Request() : *request;
+  std::string s = !secret ? "" : *secret;
 
   std::string str = strToSign(r.method, r.query);
   std::string sign_method = "HMAC-SHA1";
@@ -148,23 +145,24 @@ string Alibabacloud_RPCUtil::Client::getSignature(Request *request,
     hmac<sha1>::calc(str, s, hash_val);
     return base64::encode_from_array(hash_val, sha1::HASH_SIZE);
   } else {
-    boost::uint8_t hash_val[sha1::HASH_SIZE];
+    boost::uint8_t hash_val[sha256::HASH_SIZE];
     hmac<sha256>::calc(str, s, hash_val);
-    return base64::encode_from_array(hash_val, sha1::HASH_SIZE);
+    return base64::encode_from_array(hash_val, sha256::HASH_SIZE);
   }
 }
 
 string
-Alibabacloud_RPCUtil::Client::getSignatureV1(map<string, string> *signedParams,
-                                             string *method, string *secret) {
+Alibabacloud_RPCUtil::Client::getSignatureV1(shared_ptr<map<string, string>> signedParams,
+                                             shared_ptr<string> method,
+                                             shared_ptr<string> secret) {
   map<string, string> sp;
-  if (nullptr == signedParams) {
+  if (!signedParams) {
     sp = map<string, string>();
   } else {
     sp = *signedParams;
   }
-  string m = method == nullptr ? "" : *method;
-  string s = secret == nullptr ? "" : *secret;
+  string m = !method ? "" : *method;
+  string s = !secret ? "" : *secret;
 
   std::string str = strToSign(std::move(m), sp);
   s = s + "&";
@@ -173,8 +171,8 @@ Alibabacloud_RPCUtil::Client::getSignatureV1(map<string, string> *signedParams,
   return base64::encode_from_array(hash_val, sha1::HASH_SIZE);
 }
 
-bool Alibabacloud_RPCUtil::Client::hasError(map<string, boost::any> *obj) {
-  if (nullptr == obj) {
+bool Alibabacloud_RPCUtil::Client::hasError(shared_ptr<map<string, boost::any>> obj) {
+  if (!obj) {
     return true;
   }
   map<string, boost::any> o = *obj;
@@ -217,11 +215,14 @@ string Alibabacloud_RPCUtil::Client::getTimestamp() {
   return ss.str();
 }
 
-void Alibabacloud_RPCUtil::Client::convert(Model *body, Model *content) {
+void Alibabacloud_RPCUtil::Client::convert(shared_ptr<Model>& body,
+                                           shared_ptr<Model>& content) {
+  map<string, boost::any> props;
   map<std::string, boost::any> properties = body->toMap();
   for (const auto &it : properties) {
-    content->set(it.first, it.second);
+    props[it.first] = it.second;
   }
+  content->fromMap(props);
 }
 
 void flatten(map<string, string> &res, std::string prefix, boost::any curr) {
@@ -280,7 +281,7 @@ void flatten(map<string, string> &res, std::string prefix, boost::any curr) {
 }
 
 map<string, string>
-Alibabacloud_RPCUtil::Client::query(map<string, boost::any> *filter) {
+Alibabacloud_RPCUtil::Client::query(shared_ptr<map<string, boost::any>> filter) {
   map<string, string> flat;
   flatten(flat, string(""), boost::any(*filter));
   map<string, string> res;
@@ -290,8 +291,8 @@ Alibabacloud_RPCUtil::Client::query(map<string, boost::any> *filter) {
   return res;
 }
 
-string Alibabacloud_RPCUtil::Client::getOpenPlatFormEndpoint(string *endpoint,
-                                                             string *regionId) {
+string Alibabacloud_RPCUtil::Client::getOpenPlatFormEndpoint(shared_ptr<string> endpoint,
+                                                             shared_ptr<string> regionId) {
   std::vector<string> supportedRegionId = {"ap-southeast-1", "ap-northeast-1",
                                            "eu-central-1", "cn-hongkong",
                                            "ap-south-1"};
