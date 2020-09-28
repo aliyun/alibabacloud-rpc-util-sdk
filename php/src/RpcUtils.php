@@ -154,7 +154,7 @@ class RpcUtils
         return $flatten;
     }
 
-    private static function getStrToSign($method, $query)
+    public static function getStrToSign($method, $query)
     {
         ksort($query);
 
@@ -163,8 +163,8 @@ class RpcUtils
             $str = rawurlencode($k);
             if (null !== $v && '' !== $v) {
                 $str .= '=' . rawurlencode($v);
-                array_push($params, $str);
             }
+            array_push($params, $str);
         }
         $str = implode('&', $params);
 
