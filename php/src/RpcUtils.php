@@ -14,7 +14,7 @@ class RpcUtils
     {
         if ('internal' == $endpointType) {
             $tmp      = explode('.', $endpoint);
-            $tmp[0] .= '-internal';
+            $tmp[0]   .= '-internal';
             $endpoint = implode('.', $tmp);
         }
         if ($useAccelerate && 'accelerate' == $endpointType) {
@@ -43,7 +43,7 @@ class RpcUtils
      */
     public static function getSignature($request, $secret)
     {
-        $secret .= '&';
+        $secret    .= '&';
         $strToSign = self::getStrToSign($request->method, $request->query);
 
         $signMethod = isset($request->query['SignatureMethod']) ? $request->query['SignatureMethod'] : 'HMAC-SHA1';
@@ -60,7 +60,7 @@ class RpcUtils
      */
     public static function getSignatureV1($signedParams, $method, $secret)
     {
-        $secret .= '&';
+        $secret    .= '&';
         $strToSign = self::getStrToSign($method, $signedParams);
 
         return self::encode('', $strToSign, $secret);
@@ -114,6 +114,9 @@ class RpcUtils
         }
         $tmp = [];
         foreach ($dict as $k => $v) {
+            if (is_bool($v)) {
+                $v = $v ? "True" : "False";
+            }
             if (0 !== strpos($k, '_')) {
                 $tmp[$k] = $v;
             }
