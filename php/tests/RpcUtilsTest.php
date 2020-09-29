@@ -51,7 +51,7 @@ class RpcUtilsTest extends TestCase
 
     public function testGetStrToSign()
     {
-        $this->assertEquals('GET&%2F&complex%3DFF%253D3iP2yN79-ED6%2529FU%253BR%2528F%252CmpP%252F4f8%252CUY%255B.3.g%252Br%2528806x%257B5%252A%2525%252F%253D%2529O8%25404%2526%255B%255D%2524%255Erp%26empty%26foo%3Dbar%26null%26number%3D0',
+        $this->assertEquals('GET&%2F&complex%3DFF%253D3iP2yN79-ED6%2529FU%253BR%2528F%252CmpP%252F4f8%252CUY%255B.3.g%252Br%2528806x%257B5%252A%2525%252F%253D%2529O8%25404%2526%255B%255D%2524%255Erp%26empty%3D%26foo%3Dbar%26number%3D0',
         RpcUtils::getStrToSign('GET', [
             'foo'      => 'bar',
             'empty'    => '',

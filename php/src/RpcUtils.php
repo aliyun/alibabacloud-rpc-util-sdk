@@ -160,9 +160,14 @@ class RpcUtils
 
         $params = [];
         foreach ($query as $k => $v) {
+            if (null === $v) {
+                continue;
+            }
             $str = rawurlencode($k);
-            if (null !== $v && '' !== $v) {
+            if ('' !== $v) {
                 $str .= '=' . rawurlencode($v);
+            } else {
+                $str .= '=';
             }
             array_push($params, $str);
         }
