@@ -2,7 +2,6 @@
 #include <memory>
 #include <alibabacloud/rpcutil.hpp>
 #include <darabonba/core.hpp>
-#include <boost/shared_ptr.hpp>
 #include <map>
 #include <utility>
 
@@ -127,9 +126,7 @@ TEST(tests, convert) {
   shared_ptr<TestModel> oModel(new TestModel);
   iModel->setName(name);
   iModel->setTest(test);
-  auto i_model = static_pointer_cast<Model>(iModel);
-  auto o_model = static_pointer_cast<Model>(oModel);
-  Alibabacloud_RPCUtil::Client::convert(i_model, o_model);
+  Alibabacloud_RPCUtil::Client::convert(iModel, oModel);
   ASSERT_EQ(name, oModel->getName());
   ASSERT_EQ(test, oModel->getTest());
 }

@@ -29,8 +29,8 @@ public:
                                shared_ptr<string> secret);
   static bool hasError(shared_ptr<map<string, boost::any>> obj);
   static string getTimestamp();
-  static void convert(shared_ptr<Model>& body,
-                      shared_ptr<Model>& content);
+  static void convert(const shared_ptr<Model>& body,
+                      const shared_ptr<Model>& content);
   static map<string, string> query(shared_ptr<map<string, boost::any>> filter);
   static string getOpenPlatFormEndpoint(shared_ptr<string> endpoint,
                                         shared_ptr<string> regionId);

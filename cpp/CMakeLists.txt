@@ -51,7 +51,7 @@ set_target_properties(${PROJECT_NAME}
         PROPERTIES
         POSITION_INDEPENDENT_CODE 1
         SOVERSION ${PROJECT_VERSION_MAJOR}
-        OUTPUT_NAME "rpcutil"
+        OUTPUT_NAME "${PROJECT_NAME}"
         DEBUG_POSTFIX "_d"
         PUBLIC_HEADER "${headers}"
         MACOSX_RPATH ON
@@ -59,7 +59,7 @@ set_target_properties(${PROJECT_NAME}
 
 add_subdirectory(external)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE darabonba_core)
+target_link_libraries(${PROJECT_NAME} PRIVATE crypto darabonba_core)
 
 if (ENABLE_UNIT_TESTS)
     include(CTest)
@@ -74,6 +74,7 @@ if (ENABLE_UNIT_TESTS)
             ${PROJECT_NAME}
             gtest_main
             gmock_main
+            crypto
             darabonba_core)
     add_test(NAME google_test
             COMMAND $<TARGET_FILE:tests_alibabacloud_rpcutil>)

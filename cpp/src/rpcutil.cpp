@@ -215,8 +215,8 @@ string Alibabacloud_RPCUtil::Client::getTimestamp() {
   return ss.str();
 }
 
-void Alibabacloud_RPCUtil::Client::convert(shared_ptr<Model>& body,
-                                           shared_ptr<Model>& content) {
+void Alibabacloud_RPCUtil::Client::convert(const shared_ptr<Model>& body,
+                                           const shared_ptr<Model>& content) {
   map<string, boost::any> props;
   map<std::string, boost::any> properties = body->toMap();
   for (const auto &it : properties) {
