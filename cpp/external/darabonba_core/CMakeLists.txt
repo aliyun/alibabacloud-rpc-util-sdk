@@ -22,6 +22,7 @@ else()
       ${_darabonba_core_BINARY_DIR}
     )
     target_include_directories(alibabacloud_rpcutil PRIVATE "${_darabonba_core_SOURCE_DIR}/include")
+    include_directories("${_darabonba_core_SOURCE_DIR}/include")
   endif()
   unset(_darabonba_core)
 endif()
