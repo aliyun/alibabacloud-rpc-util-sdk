@@ -103,6 +103,7 @@ func Test_Query(t *testing.T) {
 			"key": "value",
 		},
 		"strs": []string{"str1", "str2"},
+		"num":  123456789,
 	}
 
 	result := Query(filter)
@@ -110,6 +111,7 @@ func Test_Query(t *testing.T) {
 	utils.AssertEqual(t, "value", tea.StringValue(result["tag.key"]))
 	utils.AssertEqual(t, "str1", tea.StringValue(result["strs.1"]))
 	utils.AssertEqual(t, "str2", tea.StringValue(result["strs.2"]))
+	utils.AssertEqual(t, "123456789", tea.StringValue(result["num"]))
 }
 
 func Test_flatRepeatedList(t *testing.T) {
