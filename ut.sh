@@ -91,10 +91,8 @@ function run_python {
   echo $PYTHONPATH 
   # install
   cd python || return 126
-  python setup.py build
   python setup.py install
   pip install coverage
-  pip install alibabacloud-tea
 
   coverage run --source="./alibabacloud_rpc_util" -m pytest tests/test_* || return 126
   cd ../

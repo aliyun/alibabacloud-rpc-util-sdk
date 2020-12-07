@@ -10,8 +10,6 @@ from Tea.stream import STREAM_CLASS
 
 
 class Client:
-    SEPARATOR = "&"
-
     @staticmethod
     def get_endpoint(endpoint, server_use, endpoint_type):
         """
@@ -43,7 +41,6 @@ class Client:
         if not endpoint:
             service_code = product_id.split('_')[0].lower()
             return "{}.{}.aliyuncs.com".format(service_code, region_id)
-
         return endpoint
 
     @staticmethod
@@ -84,7 +81,7 @@ class Client:
 
         string_to_sign = '{}&%2F&{}'.format(method, quote_plus(canonicalized_query_string[1:], encoding="utf-8"))
 
-        digest_maker = hmac.new(bytes(secret + Client.SEPARATOR, encoding="utf-8"),
+        digest_maker = hmac.new(bytes(secret + '&', encoding="utf-8"),
                                 bytes(string_to_sign, encoding="utf-8"),
                                 digestmod=hashlib.sha1)
         hash_bytes = digest_maker.digest()
@@ -179,3 +176,7 @@ class Client:
             str_split[0] = "%s.%s" % (str_split[0], region_id)
             return ".".join(str_split)
         return endpoint
+
+
+class AioClient(Client):
+    pass
