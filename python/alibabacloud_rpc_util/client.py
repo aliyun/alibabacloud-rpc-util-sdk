@@ -163,7 +163,7 @@ class Client:
             
             if isinstance(value, bytes):
                 out[key] = str(value, encoding='utf-8')
-            else:
+            elif not isinstance(value, STREAM_CLASS):
                 out[key] = str(value)
 
     @staticmethod
