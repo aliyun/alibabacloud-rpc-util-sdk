@@ -9,7 +9,7 @@
 		"csharp": "AlibabaCloud.SDK.Common:0.2.5",
 		"ts": "@alicloud/rpc-util:^0.1.0",
 		"php": "alibabacloud/tea-rpc-utils:^0.2.0",
-		"python": "alibabacloud_rpc_util:0.0.3",
+		"python": "alibabacloud_rpc_util:0.0.4",
 		"python2": "alibabacloud_rpc_util_py2:0.0.1",
 		"cpp": "alibabacloud-sdk-cpp/rpcutil:master"
 	},

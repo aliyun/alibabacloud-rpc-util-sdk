@@ -1,3 +1,6 @@
+### 2021-01-13 Version 0.0.4
+* The query method ignore readable objects.
+
 ### 2020-06-19 Version 0.0.3
 * Fixed rpc signature
 
