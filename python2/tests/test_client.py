@@ -6,7 +6,7 @@ from alibabacloud_rpc_util.client import Client
 from Tea.request import TeaRequest
 from Tea.model import TeaModel
 
-
+module_path = os.path.dirname(__file__)
 class TestClient(unittest.TestCase):
 
     class TestConvertModel(TeaModel):
@@ -111,7 +111,6 @@ class TestClient(unittest.TestCase):
         self.assertIn("Z", Client.get_timestamp())
 
     def test_convert(self):
-        module_path = os.path.dirname(__file__)
         filename = module_path + "/test_open.txt"
         with open(filename) as f:
             model = TestClient.TestConvertModel()
@@ -142,17 +141,19 @@ class TestClient(unittest.TestCase):
         self.assertIsNone(result.get("none_test"))
         self.assertEqual("1", result.get("int_test"))
 
-        fl = [1, None]
-        sub_dict_fl = {
-            'none_test': None,
-            'int_test': 2,
-            'str_test': 'test'
-        }
-        fl.append(sub_dict_fl)
-        sl = [1, None]
-        fl.append(sl)
-        dic['list'] = fl
-        result = Client.query(dic)
+        with open(os.path.join(module_path, "test_open.txt")) as f:
+            fl = [1, None]
+            sub_dict_fl = {
+                'none_test': None,
+                'int_test': 2,
+                'str_test': 'test',
+                'file_test': f
+            }
+            fl.append(sub_dict_fl)
+            sl = [1, None]
+            fl.append(sl)
+            dic['list'] = fl
+            result = Client.query(dic)
         self.assertEqual("1", result.get("list.1"))
         self.assertIsNone(result.get("list.2"))
         self.assertEqual("1", result.get("int_test"))
@@ -160,6 +161,7 @@ class TestClient(unittest.TestCase):
         self.assertIsNone(result.get("list.3.none_test"))
         self.assertEqual("test", result.get("list.3.str_test"))
         self.assertEqual("1", result.get("list.4.1"))
+        self.assertEqual(None, result.get("list.3.file_test"))
 
         sub_map_fd = {
             'none_test': None,
