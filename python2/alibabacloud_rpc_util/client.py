@@ -161,7 +161,8 @@ class Client(object):
         else:
             if key.startswith('.'):
                 key = key[1:]
-            out[key] = TeaConverter.to_str(value)
+            if not isinstance(value, STREAM_CLASS):
+                out[key] = TeaConverter.to_str(value)
 
     @staticmethod
     def get_open_plat_form_endpoint(endpoint, region_id):
